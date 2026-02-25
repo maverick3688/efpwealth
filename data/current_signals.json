@@ -1,0 +1,32 @@
+{
+    "date": "2026-02-19",
+    "next_rebalance": "2026-03-19",
+    "regime_confidence": 0.62,
+    "allocation": {"equity": 90, "gold": 5, "debt": 5},
+    "portfolio": [
+        {"symbol": "BHARTIARTL", "weight": 7.2, "sector": "Telecom", "score": 2.41},
+        {"symbol": "HDFCBANK", "weight": 6.8, "sector": "Banking", "score": 2.35},
+        {"symbol": "TRENT", "weight": 6.5, "sector": "Retail", "score": 2.28},
+        {"symbol": "PERSISTENT", "weight": 6.1, "sector": "IT Services", "score": 2.19},
+        {"symbol": "ZOMATO", "weight": 5.8, "sector": "Internet", "score": 2.14},
+        {"symbol": "JSWSTEEL", "weight": 5.5, "sector": "Metals", "score": 2.08},
+        {"symbol": "BAJFINANCE", "weight": 5.3, "sector": "NBFC", "score": 2.01},
+        {"symbol": "TITAN", "weight": 5.1, "sector": "Consumer", "score": 1.96},
+        {"symbol": "LTIM", "weight": 4.9, "sector": "IT Services", "score": 1.91},
+        {"symbol": "POWERGRID", "weight": 4.7, "sector": "Power", "score": 1.85},
+        {"symbol": "SBILIFE", "weight": 4.5, "sector": "Insurance", "score": 1.79},
+        {"symbol": "ICICIBANK", "weight": 4.3, "sector": "Banking", "score": 1.74},
+        {"symbol": "GODREJCP", "weight": 4.1, "sector": "FMCG", "score": 1.68},
+        {"symbol": "CHOLAFIN", "weight": 3.9, "sector": "NBFC", "score": 1.63},
+        {"symbol": "RELIANCE", "weight": 3.7, "sector": "Conglomerate", "score": 1.57},
+        {"symbol": "MAXHEALTH", "weight": 3.5, "sector": "Healthcare", "score": 1.52},
+        {"symbol": "TATAMOTORS", "weight": 3.3, "sector": "Auto", "score": 1.46},
+        {"symbol": "PIIND", "weight": 3.1, "sector": "Chemicals", "score": 1.41},
+        {"symbol": "COFORGE", "weight": 2.9, "sector": "IT Services", "score": 1.35},
+        {"symbol": "ABB", "weight": 2.8, "sector": "Capital Goods", "score": 1.30}
+    ],
+    "changes": {
+        "buy": ["ZOMATO", "MAXHEALTH", "PIIND"],
+        "sell": ["SUNPHARMA", "WIPRO", "ADANIENT"]
+    }
+}

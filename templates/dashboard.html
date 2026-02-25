@@ -1,0 +1,317 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — EFP Wealth{% endblock %}
+{% block content %}
+<div class="dash">
+    <!-- Header -->
+    <div class="dash-header">
+        <div>
+            <h1>Welcome, {{ user.name }}</h1>
+            <p class="dash-sub">Client Dashboard</p>
+        </div>
+        <div class="dash-date">{{ now }}</div>
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <!-- Profile + Capital Row -->
+    <div class="dash-grid-2">
+        <!-- Profile Card -->
+        <div class="dash-card">
+            <h3>Investor Profile</h3>
+            <div class="profile-rows">
+                <div class="profile-row">
+                    <span class="profile-label">Name</span>
+                    <span class="profile-value">{{ user.name }}</span>
+                </div>
+                <div class="profile-row">
+                    <span class="profile-label">Email</span>
+                    <span class="profile-value">{{ user.email }}</span>
+                </div>
+                <div class="profile-row">
+                    <span class="profile-label">KYC Status</span>
+                    <span class="profile-badge badge-{{ user.kyc_status }}">{{ user.kyc_status | capitalize }}</span>
+                </div>
+                <div class="profile-row">
+                    <span class="profile-label">Risk Profile</span>
+                    <span class="profile-value">{{ user.risk_profile | capitalize }}</span>
+                </div>
+                <div class="profile-row">
+                    <span class="profile-label">Member Since</span>
+                    <span class="profile-value">{{ user.created_at.strftime('%b %Y') }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Capital Card -->
+        <div class="dash-card">
+            <h3>Capital & Returns</h3>
+            {% if latest_capital %}
+            <div class="capital-grid">
+                <div class="capital-item">
+                    <div class="capital-label">Capital Invested</div>
+                    <div class="capital-val">&#8377;{{ "{:,.0f}".format(latest_capital.invested) }}</div>
+                </div>
+                <div class="capital-item">
+                    <div class="capital-label">Current Value</div>
+                    <div class="capital-val gold">&#8377;{{ "{:,.0f}".format(latest_capital.current_value) }}</div>
+                </div>
+                <div class="capital-item">
+                    <div class="capital-label">P&L</div>
+                    <div class="capital-val {% if pnl >= 0 %}green{% else %}red{% endif %}">
+                        &#8377;{{ "{:+,.0f}".format(pnl) }}
+                    </div>
+                </div>
+                <div class="capital-item">
+                    <div class="capital-label">Returns</div>
+                    <div class="capital-val {% if returns_pct >= 0 %}green{% else %}red{% endif %}">
+                        {{ "{:+.1f}".format(returns_pct) }}%
+                    </div>
+                </div>
+            </div>
+            <div class="capital-date">As of {{ latest_capital.date.strftime('%d %b %Y') }}</div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📊</div>
+                <p>Your portfolio data will appear here once your capital is deployed.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Portfolio Growth Chart -->
+    {% if latest_capital %}
+    <div class="dash-card dash-full">
+        <h3>Portfolio Growth</h3>
+        <div class="chart-wrap">
+            <canvas id="growthChart"></canvas>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Referral Card -->
+    <div class="dash-card dash-full">
+        <h3>Referral Program</h3>
+        <div class="referral-grid">
+            <div class="referral-code-section">
+                <div class="referral-label">Your Referral Code</div>
+                <div class="referral-code-box">
+                    <span id="refCode">{{ user.referral_code or 'N/A' }}</span>
+                    {% if user.referral_code %}
+                    <button class="copy-btn" onclick="copyCode()">Copy</button>
+                    {% endif %}
+                </div>
+                {% if user.referral_code %}
+                <div class="referral-link">
+                    Share link: <code id="refLink">{{ request.host_url }}register?ref={{ user.referral_code }}</code>
+                </div>
+                {% endif %}
+            </div>
+            <div class="referral-stats">
+                <div class="referral-stat">
+                    <div class="referral-stat-val">{{ referral_count }}</div>
+                    <div class="referral-stat-label">Referrals Sent</div>
+                </div>
+                <div class="referral-stat">
+                    <div class="referral-stat-val">{{ approved_referrals }}</div>
+                    <div class="referral-stat-label">Approved</div>
+                </div>
+            </div>
+        </div>
+        <form method="POST" action="/referrals/invite" class="referral-form">
+            <input type="email" name="email" placeholder="Enter friend's email" required>
+            <button type="submit" class="btn-sm">Send Invite</button>
+        </form>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="dash-grid-2">
+        <a href="/signals" class="dash-link-card">
+            <div class="link-icon">📋</div>
+            <h4>Current Signals</h4>
+            <p>View the latest portfolio allocation and stock picks.</p>
+        </a>
+        <a href="/analytics" class="dash-link-card">
+            <div class="link-icon">📈</div>
+            <h4>Deep Dive Analytics</h4>
+            <p>Explore detailed performance metrics, risk analysis, and strategy breakdown.</p>
+        </a>
+    </div>
+
+    <!-- Legal -->
+    <div class="dash-legal">
+        &copy; {{ now_year }} EFP Wealth. All rights reserved. SEBI Registered Investment Adviser.
+        All content is proprietary and confidential. Reproduction prohibited without written permission.
+    </div>
+</div>
+
+<style>
+.dash { max-width: 1100px; width: 100%; }
+.dash-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; }
+.dash-header h1 { font-size: 28px; font-weight: 700; color: #1B2A4A; }
+.dash-sub { color: #64748b; font-size: 14px; margin-top: 4px; }
+.dash-date { color: #94a3b8; font-size: 13px; }
+
+.dash-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+.dash-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 28px; }
+.dash-card h3 { font-size: 16px; font-weight: 700; color: #1B2A4A; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #f1f5f9; }
+.dash-full { margin-bottom: 24px; }
+
+/* Profile */
+.profile-rows { display: flex; flex-direction: column; gap: 14px; }
+.profile-row { display: flex; justify-content: space-between; align-items: center; }
+.profile-label { font-size: 13px; color: #64748b; }
+.profile-value { font-size: 14px; font-weight: 600; color: #1B2A4A; }
+.profile-badge { font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 20px; }
+.badge-pending { background: #fef3c7; color: #92400e; }
+.badge-submitted { background: #dbeafe; color: #1e40af; }
+.badge-verified { background: #dcfce7; color: #166534; }
+
+/* Capital */
+.capital-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.capital-item { text-align: center; padding: 12px; background: #f8fafc; border-radius: 8px; }
+.capital-label { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.capital-val { font-size: 22px; font-weight: 700; color: #1B2A4A; }
+.capital-val.gold { color: #C59A2C; }
+.capital-val.green { color: #16a34a; }
+.capital-val.red { color: #dc2626; }
+.capital-date { text-align: center; color: #94a3b8; font-size: 12px; margin-top: 12px; }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 32px 16px; }
+.empty-icon { font-size: 40px; margin-bottom: 12px; }
+.empty-state p { color: #94a3b8; font-size: 14px; }
+
+/* Chart */
+.chart-wrap { height: 300px; }
+
+/* Referral */
+.referral-grid { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; flex-wrap: wrap; }
+.referral-code-section { flex: 1; min-width: 250px; }
+.referral-label { font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.referral-code-box { display: flex; align-items: center; gap: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 16px; margin-bottom: 8px; }
+.referral-code-box span { font-size: 18px; font-weight: 700; color: #C59A2C; letter-spacing: 1px; }
+.copy-btn { background: #1B2A4A; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+.copy-btn:hover { background: #2d3f5e; }
+.referral-link { font-size: 12px; color: #94a3b8; }
+.referral-link code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 11px; }
+.referral-stats { display: flex; gap: 24px; }
+.referral-stat { text-align: center; }
+.referral-stat-val { font-size: 28px; font-weight: 700; color: #1B2A4A; }
+.referral-stat-label { font-size: 12px; color: #64748b; }
+.referral-form { display: flex; gap: 12px; margin-top: 16px; padding-top: 16px; border-top: 1px solid #f1f5f9; }
+.referral-form input { flex: 1; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px; }
+.referral-form input:focus { outline: none; border-color: #C59A2C; }
+.btn-sm { background: #C59A2C; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.btn-sm:hover { background: #b08a25; }
+
+/* Quick links */
+.dash-link-card { display: block; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; text-decoration: none; transition: all 0.2s; }
+.dash-link-card:hover { border-color: #C59A2C; box-shadow: 0 4px 16px rgba(197,154,44,0.12); text-decoration: none; }
+.link-icon { font-size: 28px; margin-bottom: 12px; }
+.dash-link-card h4 { font-size: 16px; font-weight: 700; color: #1B2A4A; margin-bottom: 4px; }
+.dash-link-card p { font-size: 13px; color: #64748b; line-height: 1.5; }
+
+/* Legal */
+.dash-legal { text-align: center; color: #94a3b8; font-size: 11px; margin-top: 32px; padding-top: 24px; border-top: 1px solid #e2e8f0; line-height: 1.6; }
+
+/* Mobile */
+@media (max-width: 768px) {
+    .dash-grid-2 { grid-template-columns: 1fr; }
+    .dash-header { flex-direction: column; gap: 8px; }
+    .dash-header h1 { font-size: 22px; }
+    .capital-val { font-size: 18px; }
+    .referral-grid { flex-direction: column; }
+    .referral-stats { justify-content: flex-start; }
+    .referral-form { flex-direction: column; }
+}
+</style>
+
+{% if latest_capital %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<script>
+(function() {
+    var dates = {{ chart_dates | safe }};
+    var values = {{ chart_values | safe }};
+    var invested = {{ chart_invested | safe }};
+
+    if (dates.length < 2) return;
+
+    var ctx = document.getElementById('growthChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [
+                {
+                    label: 'Portfolio Value',
+                    data: values,
+                    borderColor: '#C59A2C',
+                    backgroundColor: 'rgba(197,154,44,0.08)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 3,
+                    borderWidth: 2,
+                },
+                {
+                    label: 'Capital Invested',
+                    data: invested,
+                    borderColor: '#94a3b8',
+                    borderDash: [6, 4],
+                    fill: false,
+                    tension: 0,
+                    pointRadius: 2,
+                    borderWidth: 1.5,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { intersect: false, mode: 'index' },
+            scales: {
+                x: {
+                    type: 'time',
+                    time: { unit: 'month', tooltipFormat: 'MMM yyyy' },
+                    grid: { display: false },
+                },
+                y: {
+                    ticks: {
+                        callback: function(v) { return '\u20B9' + (v >= 100000 ? (v/100000).toFixed(1) + 'L' : v.toLocaleString()); }
+                    },
+                    grid: { color: '#f1f5f9' },
+                }
+            },
+            plugins: {
+                legend: { position: 'top', labels: { usePointStyle: true, padding: 16 } },
+                tooltip: {
+                    callbacks: {
+                        label: function(c) { return c.dataset.label + ': \u20B9' + c.parsed.y.toLocaleString(); }
+                    }
+                }
+            }
+        }
+    });
+})();
+</script>
+{% endif %}
+
+<script>
+function copyCode() {
+    var code = document.getElementById('refCode').textContent;
+    navigator.clipboard.writeText(code).then(function() {
+        var btn = document.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
+    });
+}
+</script>
+
+{% endblock %}

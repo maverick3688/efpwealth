@@ -1,0 +1,354 @@
+"""
+EFP Wealth — Flask App
+Client portal with auth, T&C gate, capital tracking, referrals, and analytics.
+"""
+
+import os
+import json
+from pathlib import Path
+from datetime import datetime, timezone
+from functools import wraps
+
+from flask import Flask, render_template, redirect, url_for, request, flash
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+import bcrypt
+
+from models import db, User, CapitalRecord, Referral, generate_referral_code
+
+# --- Config ---
+BASE_DIR = Path(__file__).parent
+DATA_DIR = BASE_DIR / 'data'
+CURRENT_TERMS_VERSION = "1.0"
+
+app = Flask(__name__, static_folder='static', template_folder='templates')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-change-this-in-production')
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{BASE_DIR / "efpwealth.db"}'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db.init_app(app)
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+login_manager.login_message = 'Please log in to access this page.'
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return db.session.get(User, int(user_id))
+
+
+@app.context_processor
+def inject_globals():
+    """Make current date/year available in all templates."""
+    now = datetime.now(timezone.utc)
+    return dict(now=now.strftime('%d %b %Y'), now_year=now.year)
+
+
+# --- Decorators ---
+
+def terms_required(f):
+    """Require T&C acceptance before accessing protected content."""
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not current_user.terms_accepted_at:
+            return redirect(url_for('accept_terms'))
+        return f(*args, **kwargs)
+    return decorated
+
+
+# --- Public Routes ---
+
+@app.route('/')
+def landing():
+    return render_template('landing.html')
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip().lower()
+        password = request.form.get('password', '')
+        user = User.query.filter_by(email=email).first()
+
+        if user and bcrypt.checkpw(password.encode(), user.password_hash.encode()):
+            if not user.approved:
+                flash('Your account is pending approval. We will notify you once approved.', 'warning')
+                return redirect(url_for('login'))
+            login_user(user, remember=True)
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for('dashboard'))
+        else:
+            flash('Invalid email or password.', 'error')
+
+    return render_template('login.html')
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        email = request.form.get('email', '').strip().lower()
+        password = request.form.get('password', '')
+
+        if not name or not email or not password:
+            flash('All fields are required.', 'error')
+            return redirect(url_for('register'))
+
+        if len(password) < 8:
+            flash('Password must be at least 8 characters.', 'error')
+            return redirect(url_for('register'))
+
+        if User.query.filter_by(email=email).first():
+            flash('An account with this email already exists.', 'error')
+            return redirect(url_for('register'))
+
+        pw_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+
+        # Handle referral code
+        ref_code = request.args.get('ref') or request.form.get('ref_code', '')
+        referred_by_id = None
+        if ref_code:
+            referrer = User.query.filter_by(referral_code=ref_code).first()
+            if referrer:
+                referred_by_id = referrer.id
+
+        user = User(
+            email=email,
+            password_hash=pw_hash,
+            name=name,
+            approved=False,
+            referred_by=referred_by_id,
+            referral_code=generate_referral_code(),
+        )
+        db.session.add(user)
+        db.session.commit()
+
+        # Update referral tracking
+        if referred_by_id:
+            ref_record = Referral.query.filter_by(
+                referrer_id=referred_by_id, referred_email=email
+            ).first()
+            if ref_record:
+                ref_record.status = 'registered'
+            else:
+                db.session.add(Referral(
+                    referrer_id=referred_by_id,
+                    referred_email=email,
+                    status='registered',
+                ))
+            db.session.commit()
+
+        flash('Registration successful! Your account is pending approval. We will contact you shortly.', 'success')
+        return redirect(url_for('login'))
+
+    return render_template('register.html')
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('landing'))
+
+
+# --- T&C Gate ---
+
+@app.route('/accept-terms', methods=['GET', 'POST'])
+@login_required
+def accept_terms():
+    if current_user.terms_accepted_at:
+        return redirect(url_for('dashboard'))
+
+    if request.method == 'POST':
+        current_user.terms_accepted_at = datetime.now(timezone.utc)
+        current_user.terms_version = CURRENT_TERMS_VERSION
+        db.session.commit()
+        flash('Terms accepted. Welcome to your dashboard.', 'success')
+        return redirect(url_for('dashboard'))
+
+    return render_template('accept_terms.html', terms_version=CURRENT_TERMS_VERSION)
+
+
+# --- Protected Routes ---
+
+@app.route('/dashboard')
+@login_required
+@terms_required
+def dashboard():
+    # Capital data
+    latest_capital = CapitalRecord.query.filter_by(user_id=current_user.id)\
+        .order_by(CapitalRecord.date.desc()).first()
+
+    capital_history = CapitalRecord.query.filter_by(user_id=current_user.id)\
+        .order_by(CapitalRecord.date.asc()).all()
+
+    # Compute P&L
+    pnl = 0
+    returns_pct = 0
+    if latest_capital and latest_capital.invested > 0:
+        pnl = latest_capital.current_value - latest_capital.invested
+        returns_pct = (latest_capital.current_value / latest_capital.invested - 1) * 100
+
+    # Chart data
+    chart_dates = [r.date.isoformat() for r in capital_history]
+    chart_values = [r.current_value for r in capital_history]
+    chart_invested = [r.invested for r in capital_history]
+
+    # Referral stats
+    referral_count = Referral.query.filter_by(referrer_id=current_user.id).count()
+    approved_referrals = Referral.query.filter_by(
+        referrer_id=current_user.id, status='approved'
+    ).count()
+
+    return render_template('dashboard.html',
+        user=current_user,
+        latest_capital=latest_capital,
+        pnl=pnl,
+        returns_pct=returns_pct,
+        chart_dates=json.dumps(chart_dates),
+        chart_values=json.dumps(chart_values),
+        chart_invested=json.dumps(chart_invested),
+        referral_count=referral_count,
+        approved_referrals=approved_referrals,
+    )
+
+
+@app.route('/signals')
+@login_required
+@terms_required
+def signals():
+    signals_path = DATA_DIR / 'current_signals.json'
+    signals_data = None
+    if signals_path.exists():
+        signals_data = json.loads(signals_path.read_text(encoding='utf-8'))
+    return render_template('signals.html', signals=signals_data, user=current_user)
+
+
+@app.route('/analytics')
+@login_required
+@terms_required
+def analytics():
+    return render_template('analytics.html')
+
+
+@app.route('/referrals/invite', methods=['POST'])
+@login_required
+@terms_required
+def referral_invite():
+    email = request.form.get('email', '').strip().lower()
+    if not email:
+        flash('Please enter an email address.', 'error')
+        return redirect(url_for('dashboard'))
+
+    existing = Referral.query.filter_by(
+        referrer_id=current_user.id, referred_email=email
+    ).first()
+    if existing:
+        flash('You have already referred this email.', 'warning')
+        return redirect(url_for('dashboard'))
+
+    referral = Referral(referrer_id=current_user.id, referred_email=email)
+    db.session.add(referral)
+    db.session.commit()
+
+    flash(f'Referral recorded for {email}.', 'success')
+    return redirect(url_for('dashboard'))
+
+
+# --- CLI Commands ---
+
+@app.cli.command('init-db')
+def init_db():
+    """Create database tables."""
+    db.create_all()
+    print('Database initialized.')
+
+
+@app.cli.command('approve-user')
+def approve_user_cmd():
+    """Approve a user by email (interactive)."""
+    email = input('Email to approve: ').strip().lower()
+    user = User.query.filter_by(email=email).first()
+    if user:
+        user.approved = True
+        # Update referral status if referred
+        if user.referred_by:
+            ref = Referral.query.filter_by(
+                referrer_id=user.referred_by, referred_email=user.email
+            ).first()
+            if ref:
+                ref.status = 'approved'
+        db.session.commit()
+        print(f'Approved: {user.name} ({user.email})')
+    else:
+        print(f'User not found: {email}')
+
+
+@app.cli.command('add-user')
+def add_user_cmd():
+    """Create and approve a user (interactive)."""
+    name = input('Name: ').strip()
+    email = input('Email: ').strip().lower()
+    password = input('Password: ').strip()
+    pw_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+    user = User(
+        email=email,
+        password_hash=pw_hash,
+        name=name,
+        approved=True,
+        referral_code=generate_referral_code(),
+    )
+    db.session.add(user)
+    db.session.commit()
+    print(f'Created and approved: {name} ({email}) — referral code: {user.referral_code}')
+
+
+@app.cli.command('list-users')
+def list_users_cmd():
+    """List all users."""
+    for u in User.query.all():
+        status = 'approved' if u.approved else 'PENDING'
+        terms = f'terms={u.terms_version}' if u.terms_accepted_at else 'no-terms'
+        print(f'  {u.id}. {u.name} <{u.email}> [{status}] [{terms}] ref={u.referral_code} {u.created_at}')
+
+
+@app.cli.command('add-capital')
+def add_capital_cmd():
+    """Add a capital record for a user."""
+    from datetime import date as date_type
+    email = input('User email: ').strip().lower()
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        print(f'User not found: {email}')
+        return
+    date_str = input('Date (YYYY-MM-DD): ').strip()
+    invested = float(input('Total invested (INR): ').strip())
+    current_value = float(input('Current value (INR): ').strip())
+    note = input('Note (optional): ').strip() or None
+
+    record = CapitalRecord(
+        user_id=user.id,
+        date=date_type.fromisoformat(date_str),
+        invested=invested,
+        current_value=current_value,
+        note=note,
+    )
+    db.session.add(record)
+    db.session.commit()
+    pnl = current_value - invested
+    print(f'Capital record added for {user.name}: {invested:,.0f} invested, {current_value:,.0f} value, P&L {pnl:+,.0f} on {date_str}')
+
+
+# --- Init ---
+
+with app.app_context():
+    db.create_all()
+
+
+if __name__ == '__main__':
+    app.run(debug=os.environ.get('FLASK_DEBUG', '0') == '1', port=5000)
