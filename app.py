@@ -281,7 +281,7 @@ def signals():
 @login_required
 @terms_required
 def analytics():
-    return send_from_directory(app.static_folder, 'dashboard.html')
+    return render_template('analytics.html')
 
 
 @app.route('/referrals/invite', methods=['POST'])
