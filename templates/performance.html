@@ -1,0 +1,205 @@
+{% extends "base_public.html" %}
+
+{% block title %}Performance — EFP Wealth{% endblock %}
+{% block description %}Walk-forward validated track record. 29.3% CAGR, 1.71 Sharpe, -19.3% max drawdown over 9 years.{% endblock %}
+
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+{% endblock %}
+
+{% block content %}
+
+{% set h = metrics.get('hero', {}) %}
+{% set bm = metrics.get('benchmark', {}) %}
+{% set ar = metrics.get('annual_returns', {}) %}
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <h1>Track Record</h1>
+    <p>Walk-forward out-of-sample results from {{ h.get('period_start', 'Feb 2017') }} to {{ h.get('period_end', 'Feb 2026') }}. All returns include 10 bps round-trip slippage.</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+
+    <!-- Summary Cards -->
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="label">EFP Wealth — Walk-Forward</div>
+        <table>
+          <tr><td>CAGR</td><td class="mono text-green">{{ h.get('cagr', '29.3') }}%</td></tr>
+          <tr><td>Sharpe Ratio</td><td class="mono">{{ h.get('sharpe', '1.71') }}</td></tr>
+          <tr><td>Max Drawdown</td><td class="mono text-red">{{ h.get('max_dd', '-19.3') }}%</td></tr>
+          <tr><td>Calmar Ratio</td><td class="mono">{{ h.get('calmar', '1.52') }}</td></tr>
+          <tr><td>Alpha vs NIFTY</td><td class="mono text-green">+{{ h.get('alpha', '17.0') }}%</td></tr>
+          <tr><td>Beta</td><td class="mono">{{ h.get('beta', '0.61') }}</td></tr>
+          <tr><td>Return Multiple</td><td class="mono">{{ h.get('multiple', '10.1') }}x</td></tr>
+          <tr><td>Monthly Win Rate</td><td class="mono">{{ h.get('win_rate', '66') }}%</td></tr>
+        </table>
+      </div>
+      <div class="summary-card">
+        <div class="label">NIFTY 50 — Buy &amp; Hold</div>
+        <table>
+          <tr><td>CAGR</td><td class="mono">{{ bm.get('cagr', '12.4') }}%</td></tr>
+          <tr><td>Sharpe Ratio</td><td class="mono">{{ bm.get('sharpe', '0.81') }}</td></tr>
+          <tr><td>Max Drawdown</td><td class="mono text-red">{{ bm.get('max_dd', '-38.4') }}%</td></tr>
+          <tr><td>Return Multiple</td><td class="mono">{{ bm.get('multiple', '2.9') }}x</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Equity Curve -->
+    <div class="chart-container" style="margin-bottom: 56px;">
+      <div class="chart-title">Cumulative Growth (Log Scale)</div>
+      <div class="chart-subtitle">Normalised to 100 at inception. EFP Wealth vs NIFTY 50.</div>
+      <div class="chart-canvas-wrap">
+        <canvas id="perfEquityChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Annual Returns Table -->
+    <h3 style="margin-bottom: 20px;">Annual Returns</h3>
+    <table class="perf-table" style="margin-bottom: 56px;">
+      <thead>
+        <tr>
+          <th>Year</th>
+          <th>EFP Wealth</th>
+          <th>NIFTY 50</th>
+          <th>Outperformance</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for year in ar.get('years', []) %}
+        {% set wf_ret = ar.get('wf', {}).get(year|string, '') %}
+        {% set ni_ret = ar.get('nifty', {}).get(year|string, '') %}
+        <tr>
+          <td>{{ year }}</td>
+          <td class="{% if wf_ret is number and wf_ret >= 0 %}positive{% elif wf_ret is number %}negative{% endif %}">
+            {% if wf_ret is number %}{{ '%+.1f'|format(wf_ret) }}%{% else %}&mdash;{% endif %}
+          </td>
+          <td class="{% if ni_ret is number and ni_ret >= 0 %}positive{% elif ni_ret is number %}negative{% endif %}">
+            {% if ni_ret is number %}{{ '%+.1f'|format(ni_ret) }}%{% else %}&mdash;{% endif %}
+          </td>
+          <td class="{% if wf_ret is number and ni_ret is number and (wf_ret - ni_ret) >= 0 %}positive{% elif wf_ret is number and ni_ret is number %}negative{% endif %}">
+            {% if wf_ret is number and ni_ret is number %}{{ '%+.1f'|format(wf_ret - ni_ret) }}%{% else %}&mdash;{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Drawdown Chart -->
+    <div class="chart-container" style="margin-bottom: 56px;">
+      <div class="chart-title">Drawdown Analysis</div>
+      <div class="chart-subtitle">Peak-to-trough drawdown over time. Maximum drawdown: {{ h.get('max_dd', '-19.3') }}%.</div>
+      <div class="chart-canvas-wrap" style="height: 240px;">
+        <canvas id="drawdownChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Methodology Integrity -->
+    <div style="background: var(--gray-50); border: var(--border); border-radius: var(--radius); padding: 28px; margin-bottom: 32px;">
+      <h4 style="margin-bottom: 12px;">Methodology Integrity</h4>
+      <p style="font-size: 14px; color: var(--gray-500); line-height: 1.8;">
+        All results are out-of-sample, walk-forward validated across {{ h.get('windows', '17') }} non-overlapping windows.
+        No in-sample optimization of parameters. Survivorship-bias-free constituent data from 96 NSE official
+        monthly snapshots covering 338 unique stocks. 10 bps round-trip slippage applied to all trades.
+        Strategy execution assumes next-day open prices with one-period signal lag. {{ '{:,}'.format(h.get('trades', 2722)) }} total trades
+        across {{ h.get('years', '9.0') }} years.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script type="application/json" id="perfData">{{ equity_curve_json | safe }}</script>
+<script type="application/json" id="ddData">{{ drawdown_json | safe }}</script>
+<script>
+(function() {
+  // Equity curve chart
+  var raw = JSON.parse(document.getElementById('perfData').textContent);
+  if (raw && raw.wf) {
+    var ctx = document.getElementById('perfEquityChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        datasets: [
+          {
+            label: 'EFP Wealth',
+            data: raw.wf.dates.map(function(d, i) { return { x: d, y: raw.wf.values[i] }; }),
+            borderColor: '#C59A2C',
+            backgroundColor: 'rgba(197, 154, 44, 0.05)',
+            borderWidth: 2,
+            pointRadius: 0,
+            fill: true,
+            tension: 0.1
+          },
+          {
+            label: 'NIFTY 50',
+            data: raw.nifty.dates.map(function(d, i) { return { x: d, y: raw.nifty.values[i] }; }),
+            borderColor: '#94A3B8',
+            borderWidth: 1.5,
+            borderDash: [6, 4],
+            pointRadius: 0,
+            fill: false,
+            tension: 0.1
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { position: 'top', align: 'end', labels: { font: { family: "'Inter', sans-serif", size: 12 }, color: '#64748B', usePointStyle: true, pointStyle: 'line', padding: 20 } },
+          tooltip: { backgroundColor: '#1B2A4A', bodyFont: { family: "'JetBrains Mono', monospace", size: 12 }, padding: 12 }
+        },
+        scales: {
+          x: { type: 'time', time: { unit: 'year', displayFormats: { year: 'yyyy' } }, grid: { color: '#F1F5F9' }, ticks: { font: { size: 11 }, color: '#94A3B8' } },
+          y: { type: 'logarithmic', grid: { color: '#F1F5F9' }, ticks: { font: { family: "'JetBrains Mono', monospace", size: 11 }, color: '#94A3B8' } }
+        }
+      }
+    });
+  }
+
+  // Drawdown chart
+  var ddRaw = JSON.parse(document.getElementById('ddData').textContent);
+  if (ddRaw && ddRaw.dates) {
+    var ddCtx = document.getElementById('drawdownChart').getContext('2d');
+    new Chart(ddCtx, {
+      type: 'line',
+      data: {
+        datasets: [{
+          label: 'Drawdown',
+          data: ddRaw.dates.map(function(d, i) { return { x: d, y: ddRaw.values[i] }; }),
+          borderColor: '#DC2626',
+          backgroundColor: 'rgba(220, 38, 38, 0.08)',
+          borderWidth: 1.5,
+          pointRadius: 0,
+          fill: true,
+          tension: 0.1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { backgroundColor: '#1B2A4A', bodyFont: { family: "'JetBrains Mono', monospace", size: 12 }, padding: 12, callbacks: { label: function(ctx) { return ctx.parsed.y.toFixed(1) + '%'; } } }
+        },
+        scales: {
+          x: { type: 'time', time: { unit: 'year', displayFormats: { year: 'yyyy' } }, grid: { color: '#F1F5F9' }, ticks: { font: { size: 11 }, color: '#94A3B8' } },
+          y: { grid: { color: '#F1F5F9' }, ticks: { font: { family: "'JetBrains Mono', monospace", size: 11 }, color: '#94A3B8', callback: function(v) { return v + '%'; } } }
+        }
+      }
+    });
+  }
+})();
+</script>
+{% endblock %}

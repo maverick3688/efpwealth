@@ -53,6 +53,7 @@ a:hover { text-decoration: underline; }
                 <a href="/dashboard">Dashboard</a>
                 <a href="/signals">Signals</a>
                 <a href="/analytics">Analytics</a>
+                <a href="/performance">Performance</a>
                 <a href="/logout">Logout</a>
             {% else %}
                 <a href="/">Home</a>
@@ -67,7 +68,7 @@ a:hover { text-decoration: underline; }
 </div>
 
 <div class="footer-mini">
-    EFP Wealth &middot; SEBI Registered &middot; All rights reserved
+    EFP Wealth &middot; SEBI Registration {{ sebi_status }} &middot; All rights reserved
 </div>
 </body>
 </html>

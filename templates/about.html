@@ -1,0 +1,163 @@
+{% extends "base_public.html" %}
+
+{% block title %}About — EFP Wealth{% endblock %}
+{% block description %}Team, philosophy, regulatory information, and contact details for EFP Wealth.{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <h1>About EFP Wealth</h1>
+    <p>Quantitative research meets disciplined portfolio management. Built on data, validated by rigour.</p>
+  </div>
+</div>
+
+<!-- Firm Overview -->
+<section class="section">
+  <div class="container">
+    <div class="prose" style="margin-bottom: 64px;">
+      <h2 style="margin-bottom: 16px;">Who We Are</h2>
+      <p>
+        EFP Wealth is a quantitative portfolio management firm focused on Indian equities.
+        We apply systematic, factor-based strategies to construct concentrated portfolios
+        that aim to deliver superior risk-adjusted returns over market cycles.
+      </p>
+      <p>
+        Our edge is not a secret formula — it is process. Every decision in our investment
+        pipeline is rules-based, testable, and reproducible. We publish our methodology
+        transparently because we believe that honest performance speaks louder than
+        marketing narratives.
+      </p>
+      <p>
+        We serve a select group of qualified investors who value rigorous research,
+        transparent reporting, and a long-term orientation over short-term performance chasing.
+      </p>
+    </div>
+
+    <!-- Team -->
+    <h2 class="section-title" style="margin-bottom: 32px;">Leadership</h2>
+
+    <div class="team-card">
+      <div class="team-photo">FM</div>
+      <div class="team-info">
+        <h3>Founder &amp; Chief Investment Officer</h3>
+        <div class="team-title">Principal Officer</div>
+        <ul class="team-credentials">
+          <li>Quantitative research and systematic strategy development</li>
+          <li>Multi-factor portfolio construction and risk management</li>
+          <li>Walk-forward validation and survivorship-bias-free backtesting</li>
+          <li>Full-stack data engineering (Python, pandas, SQL)</li>
+          <li>Built and validated the complete EFP Wealth investment pipeline</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Philosophy -->
+    <h2 class="section-title" style="margin-bottom: 16px; margin-top: 64px;">Investment Principles</h2>
+
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; margin-bottom: 64px;">
+      <div style="padding: 24px; background: var(--gray-50); border-radius: var(--radius);">
+        <h4 style="margin-bottom: 8px;">Data Over Narrative</h4>
+        <p style="font-size: 14px; color: var(--gray-500); line-height: 1.7;">
+          Investment decisions are driven by quantitative signals, not market
+          commentary or gut feelings. Every position has a measurable rationale.
+        </p>
+      </div>
+      <div style="padding: 24px; background: var(--gray-50); border-radius: var(--radius);">
+        <h4 style="margin-bottom: 8px;">Honest Validation</h4>
+        <p style="font-size: 14px; color: var(--gray-500); line-height: 1.7;">
+          We test strategies on data they have never seen. Walk-forward validation
+          prevents overfitting and ensures the track record is genuine.
+        </p>
+      </div>
+      <div style="padding: 24px; background: var(--gray-50); border-radius: var(--radius);">
+        <h4 style="margin-bottom: 8px;">Risk Before Return</h4>
+        <p style="font-size: 14px; color: var(--gray-500); line-height: 1.7;">
+          Regime-aware allocation prioritises capital preservation. We would rather
+          underperform in euphoria than suffer catastrophic loss in a crisis.
+        </p>
+      </div>
+      <div style="padding: 24px; background: var(--gray-50); border-radius: var(--radius);">
+        <h4 style="margin-bottom: 8px;">Radical Transparency</h4>
+        <p style="font-size: 14px; color: var(--gray-500); line-height: 1.7;">
+          Our methodology, factors, signals, and validation process are fully
+          disclosed. Investors know exactly how their capital is managed.
+        </p>
+      </div>
+    </div>
+
+    <!-- Regulatory -->
+    <h2 class="section-title" style="margin-bottom: 16px;">Regulatory Information</h2>
+
+    <div style="background: var(--white); border: var(--border); border-radius: var(--radius); padding: 28px; margin-bottom: 64px;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+        <tr style="border-bottom: 1px solid var(--gray-100);">
+          <td style="padding: 12px 0; color: var(--gray-500); width: 200px;">SEBI Registration</td>
+          <td style="padding: 12px 0; color: var(--navy); font-weight: 500;">
+            {% if sebi_reg %}{{ sebi_reg }}{% else %}{{ sebi_status }}{% endif %}
+          </td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--gray-100);">
+          <td style="padding: 12px 0; color: var(--gray-500);">Category</td>
+          <td style="padding: 12px 0; color: var(--navy); font-weight: 500;">Investment Adviser</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--gray-100);">
+          <td style="padding: 12px 0; color: var(--gray-500);">Regulations</td>
+          <td style="padding: 12px 0; color: var(--navy); font-weight: 500;">SEBI (Investment Advisers) Regulations, 2013</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--gray-100);">
+          <td style="padding: 12px 0; color: var(--gray-500);">Compliance Officer</td>
+          <td style="padding: 12px 0; color: var(--navy); font-weight: 500;">To Be Appointed</td>
+        </tr>
+        <tr style="border-bottom: 1px solid var(--gray-100);">
+          <td style="padding: 12px 0; color: var(--gray-500);">Custodian</td>
+          <td style="padding: 12px 0; color: var(--navy); font-weight: 500;">To Be Appointed</td>
+        </tr>
+        <tr>
+          <td style="padding: 12px 0; color: var(--gray-500);">Grievance Redressal</td>
+          <td style="padding: 12px 0; color: var(--navy); font-weight: 500;">
+            <a href="https://scores.gov.in" target="_blank" rel="noopener">SEBI SCORES Portal</a>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Contact -->
+    <div id="contact">
+      <h2 class="section-title" style="margin-bottom: 16px;">Contact</h2>
+
+      <div class="contact-grid">
+        <div class="contact-info">
+          <p style="font-size: 15px; color: var(--gray-500); line-height: 1.8; margin-bottom: 24px;">
+            For investment enquiries or to schedule a consultation,
+            please reach out via email. We respond within 24 hours on business days.
+          </p>
+          <div class="contact-item">
+            <strong>Email</strong>
+            <a href="mailto:inquiries@efpwealth.com">inquiries@efpwealth.com</a>
+          </div>
+          <div class="contact-item">
+            <strong>Web</strong>
+            <span>efpwealth.pythonanywhere.com</span>
+          </div>
+        </div>
+        <div>
+          <div style="background: var(--gray-50); border-radius: var(--radius); padding: 28px;">
+            <h4 style="margin-bottom: 12px;">Minimum Investment</h4>
+            <p style="font-size: 14px; color: var(--gray-500); line-height: 1.7;">
+              &#x20B9;50 Lakhs. Available to qualified investors who meet the
+              suitability criteria and have completed the KYC process.
+            </p>
+            <div style="margin-top: 16px;">
+              <a href="mailto:inquiries@efpwealth.com" class="btn-primary">Request Information</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

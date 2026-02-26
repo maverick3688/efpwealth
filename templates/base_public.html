@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}EFP Wealth — Quantitative Portfolio Management{% endblock %}</title>
+<meta name="description" content="{% block description %}Systematic, quantitative portfolio management for Indian equities. Walk-forward validated multi-factor strategy for serious capital.{% endblock %}">
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- Styles -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+{% block head %}{% endblock %}
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand">
+      <span class="brand-name">EFP</span>
+      <span class="brand-sub">Wealth</span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="/performance"{% if request.path == '/performance' %} class="active"{% endif %}>Performance</a>
+      <a href="/approach"{% if request.path == '/approach' %} class="active"{% endif %}>Approach</a>
+      <a href="/about"{% if request.path == '/about' %} class="active"{% endif %}>About</a>
+      <a href="/login" class="nav-login">Client Login</a>
+    </div>
+    <button class="nav-toggle" onclick="document.getElementById('navLinks').classList.toggle('open')" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+{% block content %}{% endblock %}
+
+<!-- Regulatory Strip -->
+<section class="regulatory-strip">
+  <div class="container">
+    <div class="reg-grid">
+      <div>
+        <h4>Regulatory Status</h4>
+        {% if sebi_reg %}
+        <p>SEBI Registered: {{ sebi_reg }}<br>Investment Advisory under SEBI (IA) Regulations, 2013.</p>
+        {% else %}
+        <p>SEBI Registration {{ sebi_status }}.<br>Investment Advisory under SEBI (IA) Regulations, 2013.</p>
+        {% endif %}
+      </div>
+      <div>
+        <h4>Infrastructure</h4>
+        <p>Custodian: To Be Appointed<br>Auditor: To Be Appointed</p>
+      </div>
+      <div>
+        <h4>Investor Resources</h4>
+        <p><a href="#">Investor Charter</a> &middot; <a href="#">Disclosure Document</a><br><a href="#">Grievance Redressal</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand">EFP <span>Wealth</span></div>
+        <div class="footer-tagline">Quantitative Portfolio Management</div>
+      </div>
+      <div class="footer-nav">
+        <a href="/performance">Performance</a>
+        <a href="/approach">Approach</a>
+        <a href="/about">About</a>
+        <a href="/login">Client Login</a>
+      </div>
+    </div>
+    <div class="footer-disclaimer">
+      All returns shown are based on walk-forward backtested results using historical data
+      and are hypothetical. Past performance does not guarantee future results and is not
+      indicative of future returns. Investments in securities are subject to market risks.
+      Read all related documents carefully before investing. 10 bps round-trip slippage applied.
+      Does not include management fees, taxes, or impact costs beyond slippage. Strategy results
+      assume full investment at model signals; actual investor returns may differ.
+    </div>
+    <div class="footer-bottom">
+      &copy; {{ now_year }} EFP Wealth. All rights reserved.
+      {% if sebi_reg %}
+      &middot; SEBI Registration: {{ sebi_reg }}
+      {% else %}
+      &middot; SEBI Registration {{ sebi_status }}
+      {% endif %}
+      &middot; Complaints: <a href="https://scores.gov.in" target="_blank" rel="noopener">SEBI SCORES Portal</a>
+    </div>
+  </div>
+</footer>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

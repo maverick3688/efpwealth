@@ -1,0 +1,202 @@
+{% extends "base_public.html" %}
+
+{% block title %}Our Approach — EFP Wealth{% endblock %}
+{% block description %}13-factor quantitative model with regime-aware allocation and walk-forward validation. A systematic, rules-based investment process.{% endblock %}
+
+{% block content %}
+
+{% set h = metrics.get('hero', {}) %}
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <h1>Our Approach</h1>
+    <p>A systematic, rules-based investment process combining factor-based stock selection, regime-aware allocation, and rigorous out-of-sample validation.</p>
+  </div>
+</div>
+
+<!-- Philosophy -->
+<section class="section">
+  <div class="container">
+    <div class="prose" style="margin-bottom: 64px;">
+      <h2 style="margin-bottom: 16px;">Investment Philosophy</h2>
+      <p>
+        We believe that markets reward certain persistent risk premia — momentum, value, quality,
+        and low volatility — that can be harvested systematically. Rather than relying on human
+        judgement or conviction-based stock picking, we use a quantitative model that ranks stocks
+        on 13 measurable factors and constructs portfolios purely based on data.
+      </p>
+      <p>
+        Equally important is knowing <strong>when</strong> to invest. Our 7-signal regime detection
+        ensemble continuously monitors market conditions and adjusts the portfolio's allocation
+        between equities, gold, and debt. This reduces drawdowns without sacrificing long-term returns.
+      </p>
+      <p>
+        Every aspect of our methodology is walk-forward validated — we never use future data to make
+        past decisions. This discipline ensures that our track record reflects what an investor would
+        have actually experienced, not an optimised backtest.
+      </p>
+    </div>
+
+    <!-- 13-Factor Model -->
+    <h2 class="section-title" style="margin-bottom: 8px;">13-Factor Stock Selection Model</h2>
+    <p class="section-subtitle" style="margin-bottom: 32px;">
+      Stocks from the NIFTY LargeMidcap 250 universe are ranked on each factor.
+      Top 20 stocks by composite z-score are selected, conviction-weighted, and rebalanced monthly.
+    </p>
+
+    <div class="factor-grid">
+      <div class="factor-card">
+        <h4>Momentum (7 factors)</h4>
+        <ul class="factor-list">
+          <li>12-month price momentum <span>Trailing return excl. last month</span></li>
+          <li>6-month price momentum <span>Medium-term trend strength</span></li>
+          <li>3-month price momentum <span>Short-term acceleration</span></li>
+          <li>52-week high proximity <span>Distance from annual peak</span></li>
+          <li>Volume-weighted momentum <span>Turnover-adjusted returns</span></li>
+          <li>Risk-adjusted momentum <span>Return per unit volatility</span></li>
+          <li>Earnings momentum <span>Quarter-on-quarter EPS change</span></li>
+        </ul>
+      </div>
+      <div class="factor-card">
+        <h4>Quality (4 factors)</h4>
+        <ul class="factor-list">
+          <li>Return on Equity (ROE) <span>Profitability efficiency</span></li>
+          <li>Return on Capital (ROCE) <span>Capital allocation quality</span></li>
+          <li>Operating Profit Margin <span>Business economics strength</span></li>
+          <li>Debt-to-Equity ratio <span>Balance sheet conservatism</span></li>
+        </ul>
+      </div>
+      <div class="factor-card">
+        <h4>Value (1 factor)</h4>
+        <ul class="factor-list">
+          <li>Earnings Yield (EPS/Price) <span>Valuation attractiveness</span></li>
+        </ul>
+      </div>
+      <div class="factor-card">
+        <h4>Low Volatility (1 factor)</h4>
+        <ul class="factor-list">
+          <li>Realised volatility (60-day) <span>Risk-reduction tilt</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Regime Detection -->
+    <h2 class="section-title" style="margin-bottom: 8px; margin-top: 64px;">Regime-Aware Allocation</h2>
+    <p class="section-subtitle" style="margin-bottom: 32px;">
+      A 7-signal ensemble generates a continuous confidence score from -1 (risk-off) to +1 (risk-on).
+      The allocation between equities, gold, and debt shifts dynamically based on this score.
+    </p>
+
+    <table class="signal-table" style="margin-bottom: 32px;">
+      <thead>
+        <tr>
+          <th>Signal</th>
+          <th>Description</th>
+          <th>Timeframe</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Trend (SMA)</strong></td>
+          <td>NIFTY 50 price vs 200-day moving average</td>
+          <td>Long-term</td>
+        </tr>
+        <tr>
+          <td><strong>Trend (EMA)</strong></td>
+          <td>NIFTY 50 exponential moving average crossover</td>
+          <td>Medium-term</td>
+        </tr>
+        <tr>
+          <td><strong>Momentum</strong></td>
+          <td>Rate of change in NIFTY 50 over 60 days</td>
+          <td>Medium-term</td>
+        </tr>
+        <tr>
+          <td><strong>Volatility</strong></td>
+          <td>India VIX relative to historical range</td>
+          <td>Short-term</td>
+        </tr>
+        <tr>
+          <td><strong>Breadth</strong></td>
+          <td>Percentage of NIFTY 500 stocks above 200-day MA</td>
+          <td>Broad market</td>
+        </tr>
+        <tr>
+          <td><strong>Credit Spread</strong></td>
+          <td>Corporate vs government bond yield differential</td>
+          <td>Macro</td>
+        </tr>
+        <tr>
+          <td><strong>FII Flow</strong></td>
+          <td>Foreign institutional investor net buy/sell trend</td>
+          <td>Sentiment</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="background: var(--gray-50); border: var(--border); border-radius: var(--radius); padding: 28px; margin-bottom: 64px;">
+      <h4 style="margin-bottom: 12px;">Allocation Mapping</h4>
+      <p style="font-size: 14px; color: var(--gray-500); line-height: 1.8;">
+        <strong>Confidence +0.7 to +1.0:</strong> 100% equity (strong bull regime)<br>
+        <strong>Confidence +0.3 to +0.7:</strong> 80-100% equity, 0-10% gold, 0-10% debt<br>
+        <strong>Confidence -0.3 to +0.3:</strong> 40-80% equity, 10-30% gold, 10-30% debt<br>
+        <strong>Confidence -0.7 to -0.3:</strong> 10-40% equity, 30-45% gold, 30-45% debt<br>
+        <strong>Confidence -1.0 to -0.7:</strong> 0-10% equity, 45% gold, 45% debt (defensive)<br>
+        <br>
+        During the COVID-19 crash (March 2020), the regime score dropped to -0.85 and the
+        portfolio shifted to 3% equity, limiting the drawdown to under 12% while NIFTY fell 38%.
+      </p>
+    </div>
+
+    <!-- Walk-Forward Validation -->
+    <h2 class="section-title" style="margin-bottom: 8px;">Walk-Forward Validation</h2>
+    <p class="section-subtitle" style="margin-bottom: 32px;">
+      The strongest test of any investment strategy is whether it works on data it has never seen.
+      We use walk-forward validation — the gold standard in systematic trading research.
+    </p>
+
+    <div class="wf-diagram">
+      <h4 style="margin-bottom: 16px;">17 Non-Overlapping Train/Test Windows</h4>
+      {% for i in range(6) %}
+      <div class="wf-bar-row">
+        <div class="wf-bar-label">W{{ i + 1 }}</div>
+        <div class="wf-bar-train" style="width: {{ 40 - i * 2 }}%;"></div>
+        <div class="wf-bar-test" style="width: {{ 12 }}%;"></div>
+        <span style="font-size: 11px; color: var(--gray-400); margin-left: 8px;">
+          {% if i == 0 %}2015-2017 train &rarr; 2017 H1 test
+          {% elif i == 1 %}2015-2017.5 train &rarr; 2017 H2 test
+          {% elif i == 2 %}2016-2018 train &rarr; 2018 H1 test
+          {% elif i == 3 %}2016-2018.5 train &rarr; 2018 H2 test
+          {% elif i == 4 %}2017-2019 train &rarr; 2019 H1 test
+          {% elif i == 5 %}... through Window 17 &rarr; 2025 H2 test
+          {% endif %}
+        </span>
+      </div>
+      {% endfor %}
+      <div class="wf-legend">
+        <span><span class="wf-legend-dot" style="background: var(--navy); opacity: 0.7;"></span> Training period (2 years)</span>
+        <span><span class="wf-legend-dot" style="background: var(--gold);"></span> Out-of-sample test (6 months)</span>
+      </div>
+    </div>
+
+    <div class="prose" style="margin-top: 32px;">
+      <p>
+        <strong>How it works:</strong> In each window, the model optimises factor weights on the training
+        data (2 years), then applies those weights to the subsequent test period (6 months) that it has
+        never seen. The portfolio track record is built entirely from these test periods — none of the
+        reported returns come from in-sample data.
+      </p>
+      <p>
+        <strong>Survivorship bias elimination:</strong> At each point in time, the stock universe is
+        reconstructed from official NSE constituent PDFs. We maintain 96 point-in-time snapshots
+        covering 338 unique stocks, ensuring that only stocks that were actually in the index at that
+        time are considered. This prevents the common bias of including stocks that survived to the
+        present while excluding those that were delisted or removed.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}
