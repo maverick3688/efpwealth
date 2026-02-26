@@ -28,6 +28,10 @@ SEBI_REG_NUMBER = None
 _metrics_path = DATA_DIR / 'site_metrics.json'
 SITE_DATA = json.loads(_metrics_path.read_text(encoding='utf-8')) if _metrics_path.exists() else {}
 
+# Load editable content (site_content.json — edit this to update website text)
+_content_path = DATA_DIR / 'site_content.json'
+SITE_CONTENT = json.loads(_content_path.read_text(encoding='utf-8')) if _content_path.exists() else {}
+
 app = Flask(__name__, static_folder='static', template_folder='templates')
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-change-this-in-production')
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{BASE_DIR / "efpwealth.db"}'
@@ -46,15 +50,26 @@ def load_user(user_id):
 
 @app.context_processor
 def inject_globals():
-    """Make current date/year, site metrics, and SEBI status available in all templates."""
+    """Make current date/year, site metrics, content, and SEBI status available in all templates."""
     now = datetime.now(timezone.utc)
     return dict(
         now=now.strftime('%d %b %Y'),
         now_year=now.year,
         metrics=SITE_DATA,
+        content=SITE_CONTENT,
         sebi_status=SEBI_STATUS,
         sebi_reg=SEBI_REG_NUMBER,
     )
+
+
+@app.template_filter('fill_metrics')
+def fill_metrics(text, metrics_dict):
+    """Replace {key} placeholders in content strings with metric values."""
+    if not text or not metrics_dict:
+        return text
+    for k, v in metrics_dict.items():
+        text = text.replace('{' + k + '}', str(v))
+    return text
 
 
 # --- Decorators ---
@@ -86,7 +101,8 @@ def performance():
 
 @app.route('/approach')
 def approach():
-    return render_template('approach.html')
+    return render_template('approach.html',
+        allocation_json=json.dumps(SITE_DATA.get('allocation', {})))
 
 
 @app.route('/about')

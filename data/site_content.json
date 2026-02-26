@@ -1,0 +1,157 @@
+{
+  "landing": {
+    "hero_headline": "Systematic Alpha for <span class=\"text-gold\">Serious Capital</span>",
+    "hero_subtitle": "A 13-factor, regime-aware strategy with walk-forward validation across {years} years. Designed for patient, long-term capital seeking systematic alpha with institutional-grade risk management.",
+    "metric_labels": {
+      "cagr": "CAGR",
+      "sharpe": "Sharpe Ratio",
+      "max_dd": "Max Drawdown",
+      "alpha": "Alpha vs NIFTY"
+    },
+    "equity_chart_title": "Growth of \u20b91 Crore",
+    "equity_chart_subtitle": "Walk-forward out-of-sample results vs NIFTY 50 buy-and-hold. Normalised to 100 at inception.",
+    "deep_dive_title": "Want the Full Picture?",
+    "deep_dive_subtitle": "Detailed analytics dashboard with per-window breakdowns, drawdown analysis, and regime performance.",
+    "process_steps": [
+      {
+        "title": "Factor-Based Stock Selection",
+        "description": "13 quantitative factors spanning momentum, value, quality, and low volatility. Cross-sectional ranking of NIFTY LargeMidcap 250 constituents. Top 20 positions, conviction-weighted monthly."
+      },
+      {
+        "title": "Regime-Aware Allocation",
+        "description": "Multi-signal ensemble detects market regimes on a continuous scale. Dynamically allocates between equities, gold, and debt based on conviction."
+      },
+      {
+        "title": "Walk-Forward Validation",
+        "description": "{windows} non-overlapping out-of-sample windows. 2-year training, 6-month testing, rolled forward sequentially. Survivorship-bias-free using 96 NSE constituent snapshots."
+      }
+    ],
+    "diff_table": {
+      "rows": [
+        {
+          "label": "Stock Selection",
+          "typical_pms": "Discretionary / conviction-based",
+          "index_funds": "Market-cap weighted, no selection",
+          "efp": "13-factor quantitative model"
+        },
+        {
+          "label": "Validation",
+          "typical_pms": "In-sample backtest or none",
+          "index_funds": "Tracks index (no alpha claim)",
+          "efp": "Walk-forward out-of-sample"
+        },
+        {
+          "label": "Market Timing",
+          "typical_pms": "Ad hoc cash calls",
+          "index_funds": "Fully invested always",
+          "efp": "Systematic regime detection"
+        },
+        {
+          "label": "Survivorship Bias",
+          "typical_pms": "Rarely addressed",
+          "index_funds": "Not applicable",
+          "efp": "96 point-in-time NSE snapshots"
+        },
+        {
+          "label": "Transparency",
+          "typical_pms": "Quarterly letters",
+          "index_funds": "Full holdings public",
+          "efp": "Complete methodology disclosed"
+        }
+      ]
+    },
+    "cta_headline": "For Qualified Investors Seeking Systematic,<br>Research-Driven Portfolio Management",
+    "cta_body": "Minimum investment \u20b950 Lakhs. Available to accredited investors who understand and accept the risks of systematic equity strategies.",
+    "cta_contact_email": "inquiries@efpwealth.com"
+  },
+  "approach": {
+    "page_title": "Our Approach",
+    "page_subtitle": "A systematic, rules-based investment process combining factor-based stock selection, regime-aware allocation, and rigorous out-of-sample validation.",
+    "philosophy_paragraphs": [
+      "We believe that markets reward certain persistent risk premia \u2014 momentum, value, quality, and low volatility \u2014 that can be harvested systematically. Rather than relying on human judgement or conviction-based stock picking, we use a quantitative model that ranks stocks on 13 measurable factors and constructs portfolios purely based on data.",
+      "Equally important is knowing <strong>when</strong> to invest. Our regime detection ensemble continuously monitors market conditions and adjusts the portfolio's allocation between equities, gold, and debt. This reduces drawdowns without sacrificing long-term returns.",
+      "Every aspect of our methodology is walk-forward validated \u2014 we never use future data to make past decisions. This discipline ensures that our track record reflects what an investor would have actually experienced, not an optimised backtest."
+    ],
+    "factor_section_title": "Multi-Factor Stock Selection",
+    "factor_section_subtitle": "Stocks from the NIFTY LargeMidcap 250 universe are ranked across four factor categories. Top 20 stocks by composite score are selected, conviction-weighted, and rebalanced monthly.",
+    "factor_categories": [
+      {
+        "name": "Momentum",
+        "description": "Multiple timeframe price and earnings momentum signals",
+        "icon": "momentum"
+      },
+      {
+        "name": "Quality",
+        "description": "Profitability, capital efficiency, and balance sheet strength",
+        "icon": "quality"
+      },
+      {
+        "name": "Value",
+        "description": "Earnings-based valuation attractiveness",
+        "icon": "value"
+      },
+      {
+        "name": "Low Volatility",
+        "description": "Risk-reduction tilt toward stable names",
+        "icon": "shield"
+      }
+    ],
+    "regime_title": "Regime-Aware Allocation",
+    "regime_subtitle": "A multi-signal ensemble detects market regimes on a continuous scale. The allocation between equities, gold, and debt shifts dynamically based on regime conviction.",
+    "allocation_chart_title": "Historical Asset Allocation",
+    "allocation_chart_subtitle": "Dynamic allocation across equities, gold, and debt based on regime confidence score. Each bar represents a monthly rebalance point.",
+    "wf_section_title": "Walk-Forward Validation",
+    "wf_section_subtitle": "The strongest test of any investment strategy is whether it works on data it has never seen. We use walk-forward validation \u2014 the gold standard in systematic trading research.",
+    "wf_description": "<strong>How it works:</strong> In each window, the model optimises factor weights on the training data (2 years), then applies those weights to the subsequent test period (6 months) that it has never seen. The portfolio track record is built entirely from these test periods \u2014 none of the reported returns come from in-sample data.",
+    "wf_survivorship": "<strong>Survivorship bias elimination:</strong> At each point in time, the stock universe is reconstructed from official NSE constituent PDFs. We maintain 96 point-in-time snapshots covering 338 unique stocks, ensuring that only stocks that were actually in the index at that time are considered."
+  },
+  "performance": {
+    "page_title": "Track Record",
+    "page_subtitle": "Walk-forward out-of-sample results from {period_start} to {period_end}. All returns include 10 bps round-trip slippage.",
+    "methodology_note": "All results are out-of-sample, walk-forward validated across {windows} non-overlapping windows. No in-sample optimization of parameters. Survivorship-bias-free constituent data from 96 NSE official monthly snapshots covering 338 unique stocks. 10 bps round-trip slippage applied to all trades. Strategy execution assumes next-day open prices with one-period signal lag. {trades} total trades across {years} years."
+  },
+  "about": {
+    "page_title": "About EFP Wealth",
+    "page_subtitle": "Quantitative research meets disciplined portfolio management. Built on data, validated by rigour.",
+    "firm_description": [
+      "EFP Wealth is a quantitative portfolio management firm focused on Indian equities. We apply systematic, factor-based strategies to construct concentrated portfolios that aim to deliver superior risk-adjusted returns over market cycles.",
+      "Our edge is not a secret formula \u2014 it is process. Every decision in our investment pipeline is rules-based, testable, and reproducible. We publish our methodology transparently because we believe that honest performance speaks louder than marketing narratives.",
+      "We serve a select group of qualified investors who value rigorous research, transparent reporting, and a long-term orientation over short-term performance chasing."
+    ],
+    "principles": [
+      {
+        "title": "Data Over Narrative",
+        "description": "Investment decisions are driven by quantitative signals, not market commentary or gut feelings. Every position has a measurable rationale."
+      },
+      {
+        "title": "Honest Validation",
+        "description": "We test strategies on data they have never seen. Walk-forward validation prevents overfitting and ensures the track record is genuine."
+      },
+      {
+        "title": "Risk Before Return",
+        "description": "Regime-aware allocation prioritises capital preservation. We would rather underperform in euphoria than suffer catastrophic loss in a crisis."
+      },
+      {
+        "title": "Radical Transparency",
+        "description": "Our methodology, factors, signals, and validation process are fully disclosed. Investors know exactly how their capital is managed."
+      }
+    ],
+    "contact_email": "inquiries@efpwealth.com",
+    "contact_web": "efpwealth.pythonanywhere.com",
+    "min_investment": "\u20b950 Lakhs"
+  },
+  "disclaimers": {
+    "banner_text": "All returns shown are walk-forward backtested results using historical data and are hypothetical. Past performance does not guarantee future results. Investments are subject to market risks. This is not investment advice.",
+    "sticky_text": "Past performance is hypothetical and does not guarantee future results. Not investment advice.",
+    "footer_text": "All returns shown are based on walk-forward backtested results using historical data and are hypothetical. Past performance does not guarantee future results and is not indicative of future returns. Investments in securities are subject to market risks. Read all related documents carefully before investing. 10 bps round-trip slippage applied. Does not include management fees, taxes, or impact costs beyond slippage. Strategy results assume full investment at model signals; actual investor returns may differ."
+  },
+  "navigation": {
+    "brand_name": "EFP",
+    "brand_sub": "Wealth"
+  },
+  "meta": {
+    "content_version": "1.1",
+    "last_edited": "2026-02-26",
+    "notes": "Edit this file to update website text. Restart Flask (or reload on PythonAnywhere) to apply changes."
+  }
+}

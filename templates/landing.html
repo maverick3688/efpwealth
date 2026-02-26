@@ -10,57 +10,44 @@
 {% block content %}
 
 {% set h = metrics.get('hero', {}) %}
+{% set c = content.get('landing', {}) %}
 
-<!-- Hero -->
-<section class="hero">
+<!-- Hero (dark gradient, centered — V1 style) -->
+<section class="hero-dark">
   <div class="container">
-    <div class="hero-grid">
-      <div class="hero-content">
-        <h1>Quantitative Portfolio Management for Indian Equities</h1>
-        <p class="hero-subtitle">
-          A 13-factor, regime-aware strategy with walk-forward validation across
-          {{ h.get('years', '9.0') }} years. Designed for patient, long-term capital
-          seeking systematic alpha with institutional-grade risk management.
-        </p>
-        <div class="hero-ctas">
-          <a href="/about#contact" class="btn-primary">Schedule a Consultation</a>
-          <a href="/performance" class="btn-text">View Track Record &rarr;</a>
-        </div>
-      </div>
+    <h1>{{ c.get('hero_headline', 'Systematic Alpha for <span class="text-gold">Serious Capital</span>') | safe }}</h1>
+    <p class="hero-subtitle">
+      {{ c.get('hero_subtitle', '') | fill_metrics(h) }}
+    </p>
 
-      <div class="metrics-card">
-        <div class="metrics-card-header">Walk-Forward Results</div>
-        <div class="metrics-card-period">
-          {{ h.get('period_start', 'Feb 2017') }} &mdash; {{ h.get('period_end', 'Feb 2026') }}
-          ({{ h.get('years', '9.0') }} years)
-        </div>
-        <table class="metrics-table">
-          <tr>
-            <td>CAGR</td>
-            <td class="text-green">{{ h.get('cagr', '29.3') }}%</td>
-          </tr>
-          <tr>
-            <td>Sharpe Ratio</td>
-            <td>{{ h.get('sharpe', '1.71') }}</td>
-          </tr>
-          <tr>
-            <td>Max Drawdown</td>
-            <td class="text-red">{{ h.get('max_dd', '-19.3') }}%</td>
-          </tr>
-          <tr>
-            <td>Alpha vs NIFTY 50</td>
-            <td class="text-green">+{{ h.get('alpha', '17.0') }}%</td>
-          </tr>
-          <tr>
-            <td>Beta</td>
-            <td>{{ h.get('beta', '0.61') }}</td>
-          </tr>
-          <tr>
-            <td>Calmar Ratio</td>
-            <td>{{ h.get('calmar', '1.52') }}</td>
-          </tr>
-        </table>
+    <div class="hero-metrics-strip">
+      <div class="hero-metric-box">
+        <span class="hero-metric-value">{{ h.get('cagr', '29.3') }}%</span>
+        <span class="hero-metric-label">{{ c.get('metric_labels', {}).get('cagr', 'CAGR') }}</span>
       </div>
+      <div class="hero-metric-box">
+        <span class="hero-metric-value">{{ h.get('sharpe', '1.71') }}</span>
+        <span class="hero-metric-label">{{ c.get('metric_labels', {}).get('sharpe', 'Sharpe Ratio') }}</span>
+      </div>
+      <div class="hero-metric-box">
+        <span class="hero-metric-value">{{ h.get('max_dd', '-19.3') }}%</span>
+        <span class="hero-metric-label">{{ c.get('metric_labels', {}).get('max_dd', 'Max Drawdown') }}</span>
+      </div>
+      <div class="hero-metric-box">
+        <span class="hero-metric-value">+{{ h.get('alpha', '17.0') }}%</span>
+        <span class="hero-metric-label">{{ c.get('metric_labels', {}).get('alpha', 'Alpha vs NIFTY') }}</span>
+      </div>
+    </div>
+
+    <div class="hero-period">
+      Walk-forward out-of-sample results &middot;
+      {{ h.get('period_start', 'Feb 2017') }} &mdash; {{ h.get('period_end', 'Feb 2026') }}
+      ({{ h.get('years', '9.0') }} years)
+    </div>
+
+    <div class="hero-ctas">
+      <a href="/about#contact" class="btn-primary">Schedule a Consultation</a>
+      <a href="/performance" class="btn-text-light">View Track Record &rarr;</a>
     </div>
   </div>
 </section>
@@ -89,9 +76,9 @@
 <section class="chart-section">
   <div class="container">
     <div class="chart-container">
-      <div class="chart-title">Growth of &#x20B9;1 Crore</div>
+      <div class="chart-title">{{ c.get('equity_chart_title', 'Growth of &#x20B9;1 Crore') }}</div>
       <div class="chart-subtitle">
-        Walk-forward out-of-sample results vs NIFTY 50 buy-and-hold. Normalised to 100 at inception.
+        {{ c.get('equity_chart_subtitle', 'Walk-forward out-of-sample results vs NIFTY 50 buy-and-hold. Normalised to 100 at inception.') }}
       </div>
       <div class="chart-canvas-wrap">
         <canvas id="equityChart"></canvas>
@@ -100,6 +87,17 @@
         <a href="/performance" class="btn-text">View complete track record with annual returns and drawdown analysis &rarr;</a>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- Deep Dive -->
+<section class="deep-dive-section">
+  <div class="container">
+    <h2 class="section-title">{{ c.get('deep_dive_title', 'Want the Full Picture?') }}</h2>
+    <p class="section-subtitle">
+      {{ c.get('deep_dive_subtitle', 'Detailed analytics dashboard with per-window breakdowns, drawdown analysis, and regime performance.') }}
+    </p>
+    <a href="/analytics" class="btn-primary">Deep Dive into Analytics &rarr;</a>
   </div>
 </section>
 
@@ -115,33 +113,13 @@
     </div>
 
     <div class="process-grid">
+      {% for step in c.get('process_steps', []) %}
       <div class="process-step">
-        <div class="step-number">1</div>
-        <h3>Factor-Based Stock Selection</h3>
-        <p>
-          13 quantitative factors spanning momentum, value, quality, and low volatility.
-          Cross-sectional ranking of NIFTY LargeMidcap 250 constituents.
-          Top 20 positions, conviction-weighted monthly.
-        </p>
+        <div class="step-number">{{ loop.index }}</div>
+        <h3>{{ step.title }}</h3>
+        <p>{{ step.description | fill_metrics(h) }}</p>
       </div>
-      <div class="process-step">
-        <div class="step-number">2</div>
-        <h3>Regime-Aware Allocation</h3>
-        <p>
-          7-signal ensemble detects market regimes on a continuous scale.
-          Dynamically allocates between equities, gold, and debt based on conviction.
-          Achieved {{ h.get('beta', '0.61') }} beta with {{ h.get('max_dd', '-19.3') }}% max drawdown.
-        </p>
-      </div>
-      <div class="process-step">
-        <div class="step-number">3</div>
-        <h3>Walk-Forward Validation</h3>
-        <p>
-          {{ h.get('windows', '17') }} non-overlapping out-of-sample windows.
-          2-year training, 6-month testing, rolled forward sequentially.
-          Survivorship-bias-free using 96 NSE constituent snapshots.
-        </p>
-      </div>
+      {% endfor %}
     </div>
 
     <div style="text-align: center; margin-top: 40px;">
@@ -167,36 +145,14 @@
         </tr>
       </thead>
       <tbody>
+        {% for row in c.get('diff_table', {}).get('rows', []) %}
         <tr>
-          <td>Stock Selection</td>
-          <td>Discretionary / conviction-based</td>
-          <td>Market-cap weighted, no selection</td>
-          <td>13-factor quantitative model</td>
+          <td>{{ row.label }}</td>
+          <td>{{ row.typical_pms }}</td>
+          <td>{{ row.index_funds }}</td>
+          <td>{{ row.efp }}</td>
         </tr>
-        <tr>
-          <td>Validation</td>
-          <td>In-sample backtest or none</td>
-          <td>Tracks index (no alpha claim)</td>
-          <td>Walk-forward out-of-sample</td>
-        </tr>
-        <tr>
-          <td>Market Timing</td>
-          <td>Ad hoc cash calls</td>
-          <td>Fully invested always</td>
-          <td>Systematic regime detection</td>
-        </tr>
-        <tr>
-          <td>Survivorship Bias</td>
-          <td>Rarely addressed</td>
-          <td>Not applicable</td>
-          <td>96 point-in-time NSE snapshots</td>
-        </tr>
-        <tr>
-          <td>Transparency</td>
-          <td>Quarterly letters</td>
-          <td>Full holdings public</td>
-          <td>Complete methodology disclosed</td>
-        </tr>
+        {% endfor %}
       </tbody>
     </table>
   </div>
@@ -205,17 +161,20 @@
 <!-- CTA -->
 <section class="cta-section">
   <div class="container">
-    <h2>For Qualified Investors Seeking Systematic,<br>Research-Driven Portfolio Management</h2>
-    <p>
-      Minimum investment &#x20B9;50 Lakhs. Available to accredited investors
-      who understand and accept the risks of systematic equity strategies.
-    </p>
+    <h2>{{ c.get('cta_headline', 'For Qualified Investors Seeking Systematic,<br>Research-Driven Portfolio Management') | safe }}</h2>
+    <p>{{ c.get('cta_body', 'Minimum investment &#x20B9;50 Lakhs.') }}</p>
     <a href="/about#contact" class="btn-primary">Schedule a Consultation</a>
     <div class="cta-contact">
-      Or write to us at <a href="mailto:inquiries@efpwealth.com">inquiries@efpwealth.com</a>
+      Or write to us at <a href="mailto:{{ c.get('cta_contact_email', 'inquiries@efpwealth.com') }}">{{ c.get('cta_contact_email', 'inquiries@efpwealth.com') }}</a>
     </div>
   </div>
 </section>
+
+<!-- Sticky Disclaimer -->
+<div class="sticky-disclaimer">
+  {{ content.get('disclaimers', {}).get('sticky_text', 'Past performance is hypothetical and does not guarantee future results. Not investment advice.') }}
+  <a href="/about#contact">Full disclaimers</a>
+</div>
 
 {% endblock %}
 
@@ -288,10 +247,7 @@
           type: 'time',
           time: { unit: 'year', displayFormats: { year: 'yyyy' } },
           grid: { color: '#F1F5F9' },
-          ticks: {
-            font: { family: "'Inter', sans-serif", size: 11 },
-            color: '#94A3B8'
-          }
+          ticks: { font: { family: "'Inter', sans-serif", size: 11 }, color: '#94A3B8' }
         },
         y: {
           type: 'logarithmic',

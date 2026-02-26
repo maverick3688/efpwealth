@@ -132,6 +132,22 @@ def generate():
         'multiple': round(nifty_multiple, 1),
     }
 
+    # --- Allocation history (for approach page chart) ---
+    alloc_path = DATA_DIR / 'wf_allocations.csv'
+    if alloc_path.exists():
+        alloc_df = pd.read_csv(alloc_path, parse_dates=['date'])
+        allocation = {
+            'dates': [d.strftime('%Y-%m-%d') for d in alloc_df['date']],
+            'equity_pct': [round(v * 100, 1) for v in alloc_df['equity_pct']],
+            'gold_pct': [round(v * 100, 1) for v in alloc_df['gold_pct']],
+            'debt_pct': [round(v * 100, 1) for v in alloc_df['debt_pct']],
+            'confidence': [round(v, 3) for v in alloc_df['confidence']],
+        }
+        print(f"Allocation: {len(alloc_df)} periods, equity range {min(allocation['equity_pct'])}-{max(allocation['equity_pct'])}%")
+    else:
+        allocation = {}
+        print("Warning: wf_allocations.csv not found, skipping allocation data")
+
     # --- Assemble output ---
     site_data = {
         'hero': hero,
@@ -140,6 +156,7 @@ def generate():
         'annual_returns': annual_returns,
         'monthly_returns': monthly_returns,
         'drawdown': drawdown,
+        'allocation': allocation,
         'generated_at': datetime.now().strftime('%Y-%m-%d %H:%M'),
     }
 

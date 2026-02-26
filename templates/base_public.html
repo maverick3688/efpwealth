@@ -36,6 +36,19 @@
   </div>
 </nav>
 
+<!-- Disclaimer Banner (first visit) -->
+<div class="disclaimer-banner" id="disclaimerBanner" style="display: none;">
+  <div class="container">
+    <div class="disclaimer-banner-content">
+      <p>
+        <strong>Important:</strong>
+        {{ content.get('disclaimers', {}).get('banner_text', 'All returns shown are walk-forward backtested results using historical data and are hypothetical. Past performance does not guarantee future results. Investments are subject to market risks. This is not investment advice.') }}
+      </p>
+      <button class="disclaimer-close" onclick="dismissDisclaimer()">Understood</button>
+    </div>
+  </div>
+</div>
+
 {% block content %}{% endblock %}
 
 <!-- Regulatory Strip -->
@@ -98,5 +111,19 @@
 </footer>
 
 {% block scripts %}{% endblock %}
+
+<!-- Disclaimer banner logic -->
+<script>
+(function() {
+  if (!localStorage.getItem('efp_disclaimer_seen')) {
+    var banner = document.getElementById('disclaimerBanner');
+    if (banner) banner.style.display = 'block';
+  }
+})();
+function dismissDisclaimer() {
+  document.getElementById('disclaimerBanner').style.display = 'none';
+  localStorage.setItem('efp_disclaimer_seen', '1');
+}
+</script>
 </body>
 </html>

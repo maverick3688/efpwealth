@@ -1,17 +1,23 @@
 {% extends "base_public.html" %}
 
 {% block title %}Our Approach — EFP Wealth{% endblock %}
-{% block description %}13-factor quantitative model with regime-aware allocation and walk-forward validation. A systematic, rules-based investment process.{% endblock %}
+{% block description %}Multi-factor quantitative model with regime-aware allocation and walk-forward validation. A systematic, rules-based investment process.{% endblock %}
+
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+{% endblock %}
 
 {% block content %}
 
 {% set h = metrics.get('hero', {}) %}
+{% set c = content.get('approach', {}) %}
 
 <!-- Page Header -->
 <div class="page-header">
   <div class="container">
-    <h1>Our Approach</h1>
-    <p>A systematic, rules-based investment process combining factor-based stock selection, regime-aware allocation, and rigorous out-of-sample validation.</p>
+    <h1>{{ c.get('page_title', 'Our Approach') }}</h1>
+    <p>{{ c.get('page_subtitle', 'A systematic, rules-based investment process combining factor-based stock selection, regime-aware allocation, and rigorous out-of-sample validation.') }}</p>
   </div>
 </div>
 
@@ -20,140 +26,83 @@
   <div class="container">
     <div class="prose" style="margin-bottom: 64px;">
       <h2 style="margin-bottom: 16px;">Investment Philosophy</h2>
-      <p>
-        We believe that markets reward certain persistent risk premia — momentum, value, quality,
-        and low volatility — that can be harvested systematically. Rather than relying on human
-        judgement or conviction-based stock picking, we use a quantitative model that ranks stocks
-        on 13 measurable factors and constructs portfolios purely based on data.
-      </p>
-      <p>
-        Equally important is knowing <strong>when</strong> to invest. Our 7-signal regime detection
-        ensemble continuously monitors market conditions and adjusts the portfolio's allocation
-        between equities, gold, and debt. This reduces drawdowns without sacrificing long-term returns.
-      </p>
-      <p>
-        Every aspect of our methodology is walk-forward validated — we never use future data to make
-        past decisions. This discipline ensures that our track record reflects what an investor would
-        have actually experienced, not an optimised backtest.
-      </p>
+      {% for para in c.get('philosophy_paragraphs', []) %}
+      <p>{{ para | safe }}</p>
+      {% endfor %}
     </div>
 
-    <!-- 13-Factor Model -->
-    <h2 class="section-title" style="margin-bottom: 8px;">13-Factor Stock Selection Model</h2>
+    <!-- Multi-Factor Model — Icon Cards -->
+    <h2 class="section-title" style="margin-bottom: 8px;">{{ c.get('factor_section_title', 'Multi-Factor Stock Selection') }}</h2>
     <p class="section-subtitle" style="margin-bottom: 32px;">
-      Stocks from the NIFTY LargeMidcap 250 universe are ranked on each factor.
-      Top 20 stocks by composite z-score are selected, conviction-weighted, and rebalanced monthly.
+      {{ c.get('factor_section_subtitle', 'Stocks from the NIFTY LargeMidcap 250 universe are ranked across four factor categories. Top 20 stocks by composite score are selected, conviction-weighted, and rebalanced monthly.') }}
     </p>
 
-    <div class="factor-grid">
-      <div class="factor-card">
-        <h4>Momentum (7 factors)</h4>
-        <ul class="factor-list">
-          <li>12-month price momentum <span>Trailing return excl. last month</span></li>
-          <li>6-month price momentum <span>Medium-term trend strength</span></li>
-          <li>3-month price momentum <span>Short-term acceleration</span></li>
-          <li>52-week high proximity <span>Distance from annual peak</span></li>
-          <li>Volume-weighted momentum <span>Turnover-adjusted returns</span></li>
-          <li>Risk-adjusted momentum <span>Return per unit volatility</span></li>
-          <li>Earnings momentum <span>Quarter-on-quarter EPS change</span></li>
-        </ul>
+    <div class="factor-icon-grid">
+      <!-- Momentum -->
+      <div class="factor-icon-card">
+        <div class="factor-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#C59A2C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+            <polyline points="17 6 23 6 23 12"></polyline>
+          </svg>
+        </div>
+        <h4>Momentum</h4>
+        <p>{{ c.get('factor_categories', [{}])[0].get('description', 'Multiple timeframe price and earnings momentum signals') if c.get('factor_categories') else 'Multiple timeframe price and earnings momentum signals' }}</p>
       </div>
-      <div class="factor-card">
-        <h4>Quality (4 factors)</h4>
-        <ul class="factor-list">
-          <li>Return on Equity (ROE) <span>Profitability efficiency</span></li>
-          <li>Return on Capital (ROCE) <span>Capital allocation quality</span></li>
-          <li>Operating Profit Margin <span>Business economics strength</span></li>
-          <li>Debt-to-Equity ratio <span>Balance sheet conservatism</span></li>
-        </ul>
+      <!-- Quality -->
+      <div class="factor-icon-card">
+        <div class="factor-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#C59A2C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <polyline points="9 12 11 14 15 10"></polyline>
+          </svg>
+        </div>
+        <h4>Quality</h4>
+        <p>{{ c.get('factor_categories', [{}]*2)[1].get('description', 'Profitability, capital efficiency, and balance sheet strength') if c.get('factor_categories') and c.get('factor_categories')|length > 1 else 'Profitability, capital efficiency, and balance sheet strength' }}</p>
       </div>
-      <div class="factor-card">
-        <h4>Value (1 factor)</h4>
-        <ul class="factor-list">
-          <li>Earnings Yield (EPS/Price) <span>Valuation attractiveness</span></li>
-        </ul>
+      <!-- Value -->
+      <div class="factor-icon-card">
+        <div class="factor-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#C59A2C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23"></line>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+          </svg>
+        </div>
+        <h4>Value</h4>
+        <p>{{ c.get('factor_categories', [{}]*3)[2].get('description', 'Earnings-based valuation attractiveness') if c.get('factor_categories') and c.get('factor_categories')|length > 2 else 'Earnings-based valuation attractiveness' }}</p>
       </div>
-      <div class="factor-card">
-        <h4>Low Volatility (1 factor)</h4>
-        <ul class="factor-list">
-          <li>Realised volatility (60-day) <span>Risk-reduction tilt</span></li>
-        </ul>
+      <!-- Low Volatility -->
+      <div class="factor-icon-card">
+        <div class="factor-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#C59A2C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+        </div>
+        <h4>Low Volatility</h4>
+        <p>{{ c.get('factor_categories', [{}]*4)[3].get('description', 'Risk-reduction tilt toward stable names') if c.get('factor_categories') and c.get('factor_categories')|length > 3 else 'Risk-reduction tilt toward stable names' }}</p>
       </div>
     </div>
 
-    <!-- Regime Detection -->
-    <h2 class="section-title" style="margin-bottom: 8px; margin-top: 64px;">Regime-Aware Allocation</h2>
+    <!-- Regime-Aware Allocation -->
+    <h2 class="section-title" style="margin-bottom: 8px; margin-top: 64px;">{{ c.get('regime_title', 'Regime-Aware Allocation') }}</h2>
     <p class="section-subtitle" style="margin-bottom: 32px;">
-      A 7-signal ensemble generates a continuous confidence score from -1 (risk-off) to +1 (risk-on).
-      The allocation between equities, gold, and debt shifts dynamically based on this score.
+      {{ c.get('regime_subtitle', 'A multi-signal ensemble detects market regimes on a continuous scale. The allocation between equities, gold, and debt shifts dynamically based on regime conviction.') }}
     </p>
 
-    <table class="signal-table" style="margin-bottom: 32px;">
-      <thead>
-        <tr>
-          <th>Signal</th>
-          <th>Description</th>
-          <th>Timeframe</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><strong>Trend (SMA)</strong></td>
-          <td>NIFTY 50 price vs 200-day moving average</td>
-          <td>Long-term</td>
-        </tr>
-        <tr>
-          <td><strong>Trend (EMA)</strong></td>
-          <td>NIFTY 50 exponential moving average crossover</td>
-          <td>Medium-term</td>
-        </tr>
-        <tr>
-          <td><strong>Momentum</strong></td>
-          <td>Rate of change in NIFTY 50 over 60 days</td>
-          <td>Medium-term</td>
-        </tr>
-        <tr>
-          <td><strong>Volatility</strong></td>
-          <td>India VIX relative to historical range</td>
-          <td>Short-term</td>
-        </tr>
-        <tr>
-          <td><strong>Breadth</strong></td>
-          <td>Percentage of NIFTY 500 stocks above 200-day MA</td>
-          <td>Broad market</td>
-        </tr>
-        <tr>
-          <td><strong>Credit Spread</strong></td>
-          <td>Corporate vs government bond yield differential</td>
-          <td>Macro</td>
-        </tr>
-        <tr>
-          <td><strong>FII Flow</strong></td>
-          <td>Foreign institutional investor net buy/sell trend</td>
-          <td>Sentiment</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div style="background: var(--gray-50); border: var(--border); border-radius: var(--radius); padding: 28px; margin-bottom: 64px;">
-      <h4 style="margin-bottom: 12px;">Allocation Mapping</h4>
-      <p style="font-size: 14px; color: var(--gray-500); line-height: 1.8;">
-        <strong>Confidence +0.7 to +1.0:</strong> 100% equity (strong bull regime)<br>
-        <strong>Confidence +0.3 to +0.7:</strong> 80-100% equity, 0-10% gold, 0-10% debt<br>
-        <strong>Confidence -0.3 to +0.3:</strong> 40-80% equity, 10-30% gold, 10-30% debt<br>
-        <strong>Confidence -0.7 to -0.3:</strong> 10-40% equity, 30-45% gold, 30-45% debt<br>
-        <strong>Confidence -1.0 to -0.7:</strong> 0-10% equity, 45% gold, 45% debt (defensive)<br>
-        <br>
-        During the COVID-19 crash (March 2020), the regime score dropped to -0.85 and the
-        portfolio shifted to 3% equity, limiting the drawdown to under 12% while NIFTY fell 38%.
-      </p>
+    <div class="chart-container" style="margin-bottom: 64px;">
+      <div class="chart-title">{{ c.get('allocation_chart_title', 'Historical Asset Allocation') }}</div>
+      <div class="chart-subtitle">
+        {{ c.get('allocation_chart_subtitle', 'Dynamic allocation across equities, gold, and debt based on regime confidence score. Each bar represents a monthly rebalance point.') }}
+      </div>
+      <div class="chart-canvas-wrap" style="height: 320px;">
+        <canvas id="allocationChart"></canvas>
+      </div>
     </div>
 
     <!-- Walk-Forward Validation -->
-    <h2 class="section-title" style="margin-bottom: 8px;">Walk-Forward Validation</h2>
+    <h2 class="section-title" style="margin-bottom: 8px;">{{ c.get('wf_section_title', 'Walk-Forward Validation') }}</h2>
     <p class="section-subtitle" style="margin-bottom: 32px;">
-      The strongest test of any investment strategy is whether it works on data it has never seen.
-      We use walk-forward validation — the gold standard in systematic trading research.
+      {{ c.get('wf_section_subtitle', 'The strongest test of any investment strategy is whether it works on data it has never seen. We use walk-forward validation — the gold standard in systematic trading research.') }}
     </p>
 
     <div class="wf-diagram">
@@ -181,22 +130,96 @@
     </div>
 
     <div class="prose" style="margin-top: 32px;">
-      <p>
-        <strong>How it works:</strong> In each window, the model optimises factor weights on the training
-        data (2 years), then applies those weights to the subsequent test period (6 months) that it has
-        never seen. The portfolio track record is built entirely from these test periods — none of the
-        reported returns come from in-sample data.
-      </p>
-      <p>
-        <strong>Survivorship bias elimination:</strong> At each point in time, the stock universe is
-        reconstructed from official NSE constituent PDFs. We maintain 96 point-in-time snapshots
-        covering 338 unique stocks, ensuring that only stocks that were actually in the index at that
-        time are considered. This prevents the common bias of including stocks that survived to the
-        present while excluding those that were delisted or removed.
-      </p>
+      <p>{{ c.get('wf_description', '') | safe }}</p>
+      <p>{{ c.get('wf_survivorship', '') | safe }}</p>
     </div>
 
   </div>
 </section>
 
+{% endblock %}
+
+{% block scripts %}
+<script type="application/json" id="allocationData">{{ allocation_json | safe }}</script>
+<script>
+(function() {
+  var raw = JSON.parse(document.getElementById('allocationData').textContent);
+  if (!raw || !raw.dates) return;
+
+  var ctx = document.getElementById('allocationChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: raw.dates,
+      datasets: [
+        {
+          label: 'Equity',
+          data: raw.equity_pct,
+          backgroundColor: '#C59A2C',
+          borderWidth: 0,
+        },
+        {
+          label: 'Gold',
+          data: raw.gold_pct,
+          backgroundColor: '#F59E0B',
+          borderWidth: 0,
+        },
+        {
+          label: 'Debt',
+          data: raw.debt_pct,
+          backgroundColor: '#94A3B8',
+          borderWidth: 0,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'top',
+          align: 'end',
+          labels: {
+            font: { family: "'Inter', sans-serif", size: 12 },
+            color: '#64748B',
+            padding: 20
+          }
+        },
+        tooltip: {
+          backgroundColor: '#1B2A4A',
+          bodyFont: { family: "'JetBrains Mono', monospace", size: 12 },
+          padding: 12,
+          callbacks: {
+            label: function(ctx) {
+              return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + '%';
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          type: 'time',
+          time: { unit: 'quarter', displayFormats: { quarter: "MMM ''yy" } },
+          stacked: true,
+          grid: { display: false },
+          ticks: {
+            font: { family: "'Inter', sans-serif", size: 11 },
+            color: '#94A3B8'
+          }
+        },
+        y: {
+          stacked: true,
+          max: 100,
+          grid: { color: '#F1F5F9' },
+          ticks: {
+            font: { family: "'JetBrains Mono', monospace", size: 11 },
+            color: '#94A3B8',
+            callback: function(v) { return v + '%'; }
+          }
+        }
+      }
+    }
+  });
+})();
+</script>
 {% endblock %}
