@@ -3,10 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Multi-Factor Walk-Forward Portfolio</title>
+<title>Analytics — EFP Wealth</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0e17; color: #e0e0e0; }
+
+/* Site nav bar */
+.site-nav { background: #1B2A4A; padding: 14px 0; border-bottom: 1px solid #2d3a52; }
+.site-nav-inner { max-width: 1400px; margin: 0 auto; padding: 0 24px; display: flex; justify-content: space-between; align-items: center; }
+.site-nav-brand { color: #C59A2C; font-size: 20px; font-weight: 700; letter-spacing: 0.5px; text-decoration: none; }
+.site-nav-brand span { color: #ffffff; font-weight: 400; }
+.site-nav-links { display: flex; gap: 20px; align-items: center; }
+.site-nav-links a { color: #cbd5e1; font-size: 14px; text-decoration: none; }
+.site-nav-links a:hover { color: #fff; }
+.site-nav-links a.active { color: #C59A2C; }
+
+/* Disclaimer banner */
+.analytics-disclaimer {
+    background: #1a1a2e; border-bottom: 1px solid #2d3a52; padding: 12px 24px;
+    font-size: 12px; color: #94a3b8; line-height: 1.6; text-align: center;
+}
+.analytics-disclaimer strong { color: #fbbf24; }
+
 .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
 
 /* Header */
@@ -74,6 +92,10 @@ tr:hover { background: #1a2030; }
 
 /* Mobile responsive */
 @media (max-width: 768px) {
+    .site-nav-inner { flex-direction: column; gap: 8px; }
+    .site-nav-links { flex-wrap: wrap; gap: 12px; justify-content: center; }
+    .site-nav-links a { font-size: 12px; }
+    .analytics-disclaimer { font-size: 11px; padding: 10px 16px; }
     .container { padding: 10px; }
     .header { flex-direction: column; align-items: flex-start; gap: 4px; }
     h1 { font-size: 18px; }
@@ -106,6 +128,29 @@ tr:hover { background: #1a2030; }
 </style>
 </head>
 <body>
+
+<!-- Site Navigation -->
+<nav class="site-nav">
+    <div class="site-nav-inner">
+        <a href="/" class="site-nav-brand">EFP <span>Wealth</span></a>
+        <div class="site-nav-links">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/signals">Signals</a>
+            <a href="/analytics" class="active">Analytics</a>
+            <a href="/performance">Performance</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Disclaimer -->
+<div class="analytics-disclaimer">
+    <strong>Important Disclaimer:</strong>
+    All performance data shown is based on walk-forward backtested results using historical data and is hypothetical.
+    Past performance does not guarantee future results. Investments in securities are subject to market risks.
+    10 bps round-trip slippage applied. Does not include management fees, taxes, or impact costs beyond slippage.
+</div>
+
 <noscript>
 <div style="padding:40px;text-align:center;color:#e0e0e0;background:#0a0e17;min-height:100vh;font-family:sans-serif;">
     <h2 style="margin-top:80px">Multi-Factor Walk-Forward Portfolio</h2>
@@ -323,6 +368,12 @@ tr:hover { background: #1a2030; }
     All returns are hypothetical and for research purposes only. Walk-forward testing with point-in-time constituent data
     (no survivorship bias). Past performance does not guarantee future results. Slippage of 10bps per round-trip applied.
     Does not include management fees, taxes, or impact costs beyond slippage.
+</div>
+
+<!-- Copyright -->
+<div style="text-align:center; padding:16px 0 8px; font-size:11px; color:#475569;">
+    &copy; 2026 EFP Wealth. All rights reserved. SEBI Registered Investment Adviser.<br>
+    All analytics, models, and content are proprietary. Reproduction or distribution without written permission is strictly prohibited.
 </div>
 
 </div>

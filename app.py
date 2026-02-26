@@ -9,7 +9,7 @@ from pathlib import Path
 from datetime import datetime, timezone
 from functools import wraps
 
-from flask import Flask, render_template, redirect, url_for, request, flash
+from flask import Flask, render_template, redirect, url_for, request, flash, send_from_directory
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import bcrypt
 
@@ -281,7 +281,7 @@ def signals():
 @login_required
 @terms_required
 def analytics():
-    return render_template('analytics.html')
+    return send_from_directory(app.static_folder, 'dashboard.html')
 
 
 @app.route('/referrals/invite', methods=['POST'])
