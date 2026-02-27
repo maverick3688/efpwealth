@@ -284,6 +284,13 @@ def analytics():
     return render_template('analytics.html')
 
 
+@app.route('/monthly-report')
+@login_required
+@terms_required
+def monthly_report():
+    return render_template('monthly_report.html')
+
+
 @app.route('/referrals/invite', methods=['POST'])
 @login_required
 @terms_required
