@@ -22,19 +22,19 @@
 
     <div class="hero-metrics-strip">
       <div class="hero-metric-box">
-        <span class="hero-metric-value">{{ h.get('cagr', '29.3') }}%</span>
+        <span class="hero-metric-value countup" data-target="{{ h.get('cagr', '29.3') }}" data-suffix="%" data-decimals="1">0%</span>
         <span class="hero-metric-label">{{ c.get('metric_labels', {}).get('cagr', 'CAGR') }}</span>
       </div>
       <div class="hero-metric-box">
-        <span class="hero-metric-value">{{ h.get('sharpe', '1.71') }}</span>
+        <span class="hero-metric-value countup" data-target="{{ h.get('sharpe', '1.71') }}" data-decimals="2">0</span>
         <span class="hero-metric-label">{{ c.get('metric_labels', {}).get('sharpe', 'Sharpe Ratio') }}</span>
       </div>
       <div class="hero-metric-box">
-        <span class="hero-metric-value">{{ h.get('max_dd', '-19.3') }}%</span>
+        <span class="hero-metric-value countup" data-target="{{ h.get('max_dd', '-19.3') }}" data-suffix="%" data-decimals="1">0%</span>
         <span class="hero-metric-label">{{ c.get('metric_labels', {}).get('max_dd', 'Max Drawdown') }}</span>
       </div>
       <div class="hero-metric-box">
-        <span class="hero-metric-value">+{{ h.get('alpha', '17.0') }}%</span>
+        <span class="hero-metric-value countup" data-target="{{ h.get('alpha', '17.0') }}" data-prefix="+" data-suffix="%" data-decimals="1">0%</span>
         <span class="hero-metric-label">{{ c.get('metric_labels', {}).get('alpha', 'Alpha vs NIFTY') }}</span>
       </div>
     </div>
@@ -57,16 +57,16 @@
   <div class="container">
     <div class="stat-bar-inner">
       <div class="stat-bar-item">
-        <span class="stat-bar-value mono">{{ h.get('multiple', '10.1') }}x</span> Return Multiple
+        <span class="stat-bar-value mono countup" data-target="{{ h.get('multiple', '10.1') }}" data-suffix="x" data-decimals="1">0x</span> Return Multiple
       </div>
       <div class="stat-bar-item">
-        <span class="stat-bar-value mono">{{ h.get('win_rate', '66') }}%</span> Monthly Win Rate
+        <span class="stat-bar-value mono countup" data-target="{{ h.get('win_rate', '66') }}" data-suffix="%" data-decimals="0">0%</span> Monthly Win Rate
       </div>
       <div class="stat-bar-item">
-        <span class="stat-bar-value mono">{{ '{:,}'.format(h.get('trades', 2722)) }}</span> Trades Executed
+        <span class="stat-bar-value mono countup" data-target="{{ h.get('trades', 2722) }}" data-commas="true" data-decimals="0">0</span> Trades Executed
       </div>
       <div class="stat-bar-item">
-        <span class="stat-bar-value mono">{{ h.get('windows', '17') }}</span> Validation Windows
+        <span class="stat-bar-value mono countup" data-target="{{ h.get('windows', '17') }}" data-decimals="0">0</span> Validation Windows
       </div>
     </div>
   </div>
@@ -261,6 +261,63 @@
       }
     }
   });
+})();
+</script>
+
+<!-- Count-up animation -->
+<script>
+(function() {
+  var DURATION = 1500;
+
+  function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+
+  function formatNumber(value, decimals, commas, prefix, suffix) {
+    var num = decimals > 0 ? value.toFixed(decimals) : Math.round(value).toString();
+    if (commas) {
+      var parts = num.split('.');
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      num = parts.join('.');
+    }
+    return (prefix || '') + num + (suffix || '');
+  }
+
+  function animateElement(el) {
+    var target = parseFloat(el.getAttribute('data-target'));
+    var decimals = parseInt(el.getAttribute('data-decimals') || '0', 10);
+    var suffix = el.getAttribute('data-suffix') || '';
+    var prefix = el.getAttribute('data-prefix') || '';
+    var commas = el.getAttribute('data-commas') === 'true';
+    var isNeg = target < 0;
+    var absTarget = Math.abs(target);
+    var start = null;
+
+    function step(ts) {
+      if (!start) start = ts;
+      var progress = Math.min((ts - start) / DURATION, 1);
+      var eased = easeOut(progress);
+      var current = eased * absTarget;
+      var display = isNeg ? -current : current;
+      el.textContent = formatNumber(display, decimals, commas, isNeg ? '' : prefix, suffix);
+      if (isNeg && progress > 0) el.textContent = formatNumber(-current, decimals, commas, '-', suffix.replace('-', ''));
+      if (progress < 1) requestAnimationFrame(step);
+      else el.textContent = formatNumber(target, decimals, commas, prefix, suffix);
+    }
+    requestAnimationFrame(step);
+  }
+
+  if ('IntersectionObserver' in window) {
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          animateElement(entry.target);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    document.querySelectorAll('.countup').forEach(function(el) { observer.observe(el); });
+  } else {
+    document.querySelectorAll('.countup').forEach(animateElement);
+  }
 })();
 </script>
 {% endblock %}
