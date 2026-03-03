@@ -22,19 +22,19 @@
 
     <div class="hero-metrics-strip">
       <div class="hero-metric-box">
-        <span class="hero-metric-value countup" data-target="{{ h.get('cagr', '40.4') }}" data-suffix="%" data-decimals="1">0%</span>
+        <span class="hero-metric-value countup" data-target="{{ h.get('cagr', '30.9') }}" data-suffix="%" data-decimals="1">0%</span>
         <span class="hero-metric-label">{{ c.get('metric_labels', {}).get('cagr', 'CAGR') }}</span>
       </div>
       <div class="hero-metric-box">
-        <span class="hero-metric-value countup" data-target="{{ h.get('sharpe', '0.90') }}" data-decimals="2">0</span>
+        <span class="hero-metric-value countup" data-target="{{ h.get('sharpe', '1.98') }}" data-decimals="2">0</span>
         <span class="hero-metric-label">{{ c.get('metric_labels', {}).get('sharpe', 'Sharpe Ratio') }}</span>
       </div>
       <div class="hero-metric-box">
-        <span class="hero-metric-value countup" data-target="{{ h.get('max_dd', '-17.1') }}" data-suffix="%" data-decimals="1">0%</span>
+        <span class="hero-metric-value countup" data-target="{{ h.get('max_dd', '-16.1') }}" data-suffix="%" data-decimals="1">0%</span>
         <span class="hero-metric-label">{{ c.get('metric_labels', {}).get('max_dd', 'Max Drawdown') }}</span>
       </div>
       <div class="hero-metric-box">
-        <span class="hero-metric-value countup" data-target="{{ h.get('alpha', '28.1') }}" data-prefix="+" data-suffix="%" data-decimals="1">0%</span>
+        <span class="hero-metric-value countup" data-target="{{ h.get('alpha', '18.5') }}" data-prefix="+" data-suffix="%" data-decimals="1">0%</span>
         <span class="hero-metric-label">{{ c.get('metric_labels', {}).get('alpha', 'Alpha vs NIFTY') }}</span>
       </div>
     </div>
@@ -57,13 +57,13 @@
   <div class="container">
     <div class="stat-bar-inner">
       <div class="stat-bar-item">
-        <span class="stat-bar-value mono countup" data-target="{{ h.get('multiple', '21.2') }}" data-suffix="x" data-decimals="1">0x</span> Return Multiple
+        <span class="stat-bar-value mono countup" data-target="{{ h.get('multiple', '11.2') }}" data-suffix="x" data-decimals="1">0x</span> Return Multiple
       </div>
       <div class="stat-bar-item">
         <span class="stat-bar-value mono countup" data-target="{{ h.get('win_rate', '69') }}" data-suffix="%" data-decimals="0">0%</span> Monthly Win Rate
       </div>
       <div class="stat-bar-item">
-        <span class="stat-bar-value mono countup" data-target="{{ h.get('trades', 60412) }}" data-commas="true" data-decimals="0">0</span> Trades Executed
+        <span class="stat-bar-value mono countup" data-target="{{ h.get('trades', 60121) }}" data-commas="true" data-decimals="0">0</span> Trades Executed
       </div>
       <div class="stat-bar-item">
         <span class="stat-bar-value mono countup" data-target="{{ h.get('windows', '17') }}" data-decimals="0">0</span> Validation Windows

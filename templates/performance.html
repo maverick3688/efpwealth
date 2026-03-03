@@ -1,7 +1,7 @@
 {% extends "base_public.html" %}
 
 {% block title %}Performance — EFP Wealth{% endblock %}
-{% block description %}Walk-forward validated track record. 40.4% CAGR, 0.90 Sharpe, -17.1% max drawdown over 9 years.{% endblock %}
+{% block description %}Walk-forward validated track record. 30.9% CAGR, 1.98 Sharpe, -16.1% max drawdown over 9 years.{% endblock %}
 
 {% block head %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -30,14 +30,14 @@
       <div class="summary-card">
         <div class="label">EFP Wealth — Walk-Forward</div>
         <table>
-          <tr><td>CAGR</td><td class="mono text-green">{{ h.get('cagr', '40.4') }}%</td></tr>
-          <tr><td>Sharpe Ratio</td><td class="mono">{{ h.get('sharpe', '0.90') }}</td></tr>
-          <tr><td>Max Drawdown</td><td class="mono text-red">{{ h.get('max_dd', '-17.1') }}%</td></tr>
-          <tr><td>Calmar Ratio</td><td class="mono">{{ h.get('calmar', '2.37') }}</td></tr>
-          <tr><td>Alpha vs NIFTY</td><td class="mono text-green">+{{ h.get('alpha', '28.1') }}%</td></tr>
+          <tr><td>CAGR</td><td class="mono text-green">{{ h.get('cagr', '30.9') }}%</td></tr>
+          <tr><td>Sharpe Ratio</td><td class="mono">{{ h.get('sharpe', '1.98') }}</td></tr>
+          <tr><td>Max Drawdown</td><td class="mono text-red">{{ h.get('max_dd', '-16.1') }}%</td></tr>
+          <tr><td>Calmar Ratio</td><td class="mono">{{ h.get('calmar', '1.92') }}</td></tr>
+          <tr><td>Alpha vs NIFTY</td><td class="mono text-green">+{{ h.get('alpha', '18.5') }}%</td></tr>
           <tr><td>Beta</td><td class="mono">{{ h.get('beta', '0.54') }}</td></tr>
-          <tr><td>Return Multiple</td><td class="mono">{{ h.get('multiple', '21.2') }}x</td></tr>
-          <tr><td>Monthly Win Rate</td><td class="mono">{{ h.get('win_rate', '66') }}%</td></tr>
+          <tr><td>Return Multiple</td><td class="mono">{{ h.get('multiple', '11.2') }}x</td></tr>
+          <tr><td>Monthly Win Rate</td><td class="mono">{{ h.get('win_rate', '69') }}%</td></tr>
         </table>
       </div>
       <div class="summary-card">
@@ -94,7 +94,7 @@
     <!-- Drawdown Chart -->
     <div class="chart-container" style="margin-bottom: 56px;">
       <div class="chart-title">Drawdown Analysis</div>
-      <div class="chart-subtitle">Peak-to-trough drawdown over time. Maximum drawdown: {{ h.get('max_dd', '-17.1') }}%.</div>
+      <div class="chart-subtitle">Peak-to-trough drawdown over time. Maximum drawdown: {{ h.get('max_dd', '-16.1') }}%.</div>
       <div class="chart-canvas-wrap" style="height: 240px;">
         <canvas id="drawdownChart"></canvas>
       </div>
@@ -112,7 +112,7 @@
         All results are out-of-sample, walk-forward validated across {{ h.get('windows', '17') }} non-overlapping windows.
         No in-sample optimization of parameters. Survivorship-bias-free constituent data from 96 NSE official
         monthly snapshots covering 338 unique stocks. 10 bps round-trip slippage applied to all trades.
-        Strategy execution assumes next-day open prices with one-period signal lag. {{ '{:,}'.format(h.get('trades', 60412)) }} total trades
+        Strategy execution assumes next-day open prices with one-period signal lag. {{ '{:,}'.format(h.get('trades', 60121)) }} total trades
         across {{ h.get('years', '9.0') }} years.
       </p>
     </div>
