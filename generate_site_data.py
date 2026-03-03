@@ -76,7 +76,7 @@ def generate():
         'period_start': wf_start.strftime('%b %Y'),
         'period_end': wf_end.strftime('%b %Y'),
         'years': round(years, 1),
-        'trades': 2722,
+        'trades': len(pd.read_csv(DATA_DIR / 'wf_trades.csv')) if (DATA_DIR / 'wf_trades.csv').exists() else 0,
         'windows': 17,
     }
 

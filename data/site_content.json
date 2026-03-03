@@ -15,7 +15,7 @@
     "process_steps": [
       {
         "title": "Factor-Based Stock Selection",
-        "description": "13 quantitative factors spanning momentum, value, quality, and low volatility. Cross-sectional ranking of NIFTY LargeMidcap 250 constituents. Top 20 positions, conviction-weighted monthly."
+        "description": "13 quantitative factors spanning momentum, value, quality, and low volatility. Cross-sectional ranking of NIFTY LargeMidcap 250 constituents. Top 20 positions with 15% max single-stock weight, rebalanced daily across 21 staggered tranches."
       },
       {
         "title": "Regime-Aware Allocation",
@@ -73,7 +73,7 @@
       "Every aspect of our methodology is walk-forward validated \u2014 we never use future data to make past decisions. This discipline ensures that our track record reflects what an investor would have actually experienced, not an optimised backtest."
     ],
     "factor_section_title": "Multi-Factor Stock Selection",
-    "factor_section_subtitle": "Stocks from the NIFTY LargeMidcap 250 universe are ranked across four factor categories. Top 20 stocks by composite score are selected, conviction-weighted, and rebalanced monthly.",
+    "factor_section_subtitle": "Stocks from the NIFTY LargeMidcap 250 universe are ranked across four factor categories. Top 20 stocks by composite score are selected with a 15% max single-stock weight cap, rebalanced daily across 21 staggered tranches.",
     "factor_categories": [
       {
         "name": "Momentum",
@@ -99,16 +99,16 @@
     "regime_title": "Regime-Aware Allocation",
     "regime_subtitle": "A multi-signal ensemble detects market regimes on a continuous scale. The allocation between equities, gold, and debt shifts dynamically based on regime conviction.",
     "allocation_chart_title": "Historical Asset Allocation",
-    "allocation_chart_subtitle": "Dynamic allocation across equities, gold, and debt based on regime confidence score. Each bar represents a monthly rebalance point.",
+    "allocation_chart_subtitle": "Dynamic allocation across equities, gold, and debt based on regime confidence score. Each bar represents a rebalance cycle (21 daily staggered tranches per cycle).",
     "wf_section_title": "Walk-Forward Validation",
     "wf_section_subtitle": "The strongest test of any investment strategy is whether it works on data it has never seen. We use walk-forward validation \u2014 the gold standard in systematic trading research.",
-    "wf_description": "<strong>How it works:</strong> In each window, the model optimises factor weights on the training data (2 years), then applies those weights to the subsequent test period (6 months) that it has never seen. The portfolio track record is built entirely from these test periods \u2014 none of the reported returns come from in-sample data.",
+    "wf_description": "<strong>How it works:</strong> In each window, the model optimises factor weights on the training data (2 years), then applies those weights to the subsequent test period (6 months) that it has never seen. Within each test window, the portfolio is rebalanced daily via 21 staggered tranches with a 15% maximum single-stock weight cap, reducing timing risk and market impact. The portfolio track record is built entirely from these test periods \u2014 none of the reported returns come from in-sample data.",
     "wf_survivorship": "<strong>Survivorship bias elimination:</strong> At each point in time, the stock universe is reconstructed from official NSE constituent PDFs. We maintain 96 point-in-time snapshots covering 338 unique stocks, ensuring that only stocks that were actually in the index at that time are considered."
   },
   "performance": {
     "page_title": "Track Record",
     "page_subtitle": "Walk-forward out-of-sample results from {period_start} to {period_end}. All returns include 10 bps round-trip slippage.",
-    "methodology_note": "All results are out-of-sample, walk-forward validated across {windows} non-overlapping windows. No in-sample optimization of parameters. Survivorship-bias-free constituent data from 96 NSE official monthly snapshots covering 338 unique stocks. 10 bps round-trip slippage applied to all trades. Strategy execution assumes next-day open prices with one-period signal lag. {trades} total trades across {years} years."
+    "methodology_note": "All results are out-of-sample, walk-forward validated across {windows} non-overlapping windows. No in-sample optimization of parameters. Staggered daily rebalancing (21 tranches) with 15% max single-stock weight cap. Survivorship-bias-free constituent data from 96 NSE official monthly snapshots covering 338 unique stocks. 10 bps round-trip slippage applied to all trades. Strategy execution assumes next-day open prices with one-period signal lag. {trades:,} total trades across {years} years."
   },
   "about": {
     "page_title": "About EFP Wealth",
@@ -150,8 +150,8 @@
     "brand_sub": "Wealth"
   },
   "meta": {
-    "content_version": "1.1",
-    "last_edited": "2026-02-26",
+    "content_version": "2.0",
+    "last_edited": "2026-03-03",
     "notes": "Edit this file to update website text. Restart Flask (or reload on PythonAnywhere) to apply changes."
   }
 }
