@@ -91,21 +91,24 @@ def terms_required(f):
 
 @app.route('/')
 def landing():
+    site_data = _load_json(_metrics_path)
     return render_template('landing.html',
-        equity_curve_json=json.dumps(SITE_DATA.get('equity_curve', {})))
+        equity_curve_json=json.dumps(site_data.get('equity_curve', {})))
 
 
 @app.route('/performance')
 def performance():
+    site_data = _load_json(_metrics_path)
     return render_template('performance.html',
-        equity_curve_json=json.dumps(SITE_DATA.get('equity_curve', {})),
-        drawdown_json=json.dumps(SITE_DATA.get('drawdown', {})))
+        equity_curve_json=json.dumps(site_data.get('equity_curve', {})),
+        drawdown_json=json.dumps(site_data.get('drawdown', {})))
 
 
 @app.route('/approach')
 def approach():
+    site_data = _load_json(_metrics_path)
     return render_template('approach.html',
-        allocation_json=json.dumps(SITE_DATA.get('allocation', {})))
+        allocation_json=json.dumps(site_data.get('allocation', {})))
 
 
 @app.route('/about')
