@@ -4,15 +4,15 @@
   "step": 7,
   "total": 8,
   "current_step": "Git commit & push",
-  "started_at": "2026-03-04 03:28:11",
+  "started_at": "2026-03-04 03:29:10",
   "log": [
     "[OK] Checkpoints backed up",
     "[SKIP] Downloading market data",
     "[OK] Running portfolio update: Portfolio updated",
-    "[FAIL] Regenerating dashboard: I/O operation on closed file\nTraceback (most recent call last):\n  File \"C:\\TradingData\\greysky\\web\\pipeline_runner.py\", line 282, in _run_step\n    importlib.reload(generate_dashboard)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Python314\\Lib\\importlib\\__init__.py\", line 129, in reload\n    _bootstrap._exec(spec, module)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^\n  File \"<frozen importlib._bootstrap>\", line 869, in _exec\n  File \"<frozen importlib._bootstrap_external>\", line 759, in exec_module\n  File \"<frozen importlib._bootstrap>\", line 491, in _call_with_frames_removed\n  File \"C:\\TradingData\\greysky\\generate_dashboard.py\", line 16, in <module>\n    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')\n                 ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: I/O operation on closed file\n",
-    "[FAIL] Regenerating monthly report: I/O operation on closed file\nTraceback (most recent call last):\n  File \"C:\\TradingData\\greysky\\web\\pipeline_runner.py\", line 290, in _run_step\n    import generate_monthly_report\n  File \"C:\\TradingData\\greysky\\generate_monthly_report.py\", line 20, in <module>\n    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')\n                 ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: I/O operation on closed file\n",
-    "[FAIL] Regenerating site metrics: I/O operation on closed file.\nTraceback (most recent call last):\n  File \"C:\\TradingData\\greysky\\web\\pipeline_runner.py\", line 302, in _run_step\n    generate_site_data.generate()\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^\n  File \"C:\\TradingData\\greysky\\web\\generate_site_data.py\", line 35, in generate\n    print(\"Generating site_metrics.json...\")\n    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nValueError: I/O operation on closed file.\n",
+    "[OK] Regenerating dashboard: Dashboard regenerated",
+    "[OK] Regenerating monthly report: Monthly report regenerated",
+    "[OK] Regenerating site metrics: Site metrics regenerated",
     "[OK] Copying files to web: Copied 3 files to web/"
   ],
-  "updated_at": "2026-03-04 03:28:17"
+  "updated_at": "2026-03-04 03:29:30"
 }
