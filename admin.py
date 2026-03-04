@@ -130,12 +130,14 @@ def revoke_user(user_id):
 @admin_required
 def pipeline():
     """Pipeline control panel."""
+    from pipeline_runner import HAS_FULL_CODEBASE
     pipeline_status = _read_pipeline_status()
     metrics = _load_json(DATA_DIR / 'site_metrics.json')
     last_update = metrics.get('generated_at', 'Never')
     return render_template('admin/pipeline.html',
         pipeline_status=pipeline_status,
         last_update=last_update,
+        has_full_codebase=HAS_FULL_CODEBASE,
     )
 
 

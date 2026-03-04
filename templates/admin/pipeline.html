@@ -4,6 +4,17 @@
 {% block admin_content %}
 <h2>Pipeline Control</h2>
 
+{% if not has_full_codebase %}
+<div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:16px 20px;margin-bottom:20px;">
+    <strong style="color:#92400e;">Limited Mode</strong>
+    <p style="color:#92400e;font-size:13px;margin:4px 0 0;">
+        Pipeline execution requires the full codebase (checkpoint_v8 + data directories).
+        Run the pipeline locally using <code>run_daily.py</code>, then deploy via <code>git push</code>.
+        The status viewer below will show results from the last local run.
+    </p>
+</div>
+{% endif %}
+
 <!-- Current Status -->
 <div class="pipeline-card" id="status-card">
     <h4>

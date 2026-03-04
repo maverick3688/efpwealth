@@ -15,16 +15,20 @@ from datetime import datetime, timezone
 # --- Path configuration ---
 # These paths work whether running locally (Windows) or on PythonAnywhere
 WEB_DIR = Path(__file__).parent
-GREYSKY_DIR = WEB_DIR.parent  # C:/TradingData/greysky
+GREYSKY_DIR = WEB_DIR.parent  # C:/TradingData/greysky (local) or /home/efpwealth (PA)
 CHECKPOINT_DIR = GREYSKY_DIR / 'checkpoint_v8'
 DATA_DIR = GREYSKY_DIR / 'data'
 STATUS_FILE = WEB_DIR / 'data' / 'pipeline_status.json'
 
-# Ensure checkpoint_v8 is importable
-if str(CHECKPOINT_DIR) not in sys.path:
-    sys.path.insert(0, str(CHECKPOINT_DIR))
-if str(GREYSKY_DIR) not in sys.path:
-    sys.path.insert(0, str(GREYSKY_DIR))
+# Detect if running on PythonAnywhere (no checkpoint_v8 directory)
+HAS_FULL_CODEBASE = CHECKPOINT_DIR.exists() and DATA_DIR.exists()
+
+# Ensure checkpoint_v8 is importable (only if available)
+if HAS_FULL_CODEBASE:
+    if str(CHECKPOINT_DIR) not in sys.path:
+        sys.path.insert(0, str(CHECKPOINT_DIR))
+    if str(GREYSKY_DIR) not in sys.path:
+        sys.path.insert(0, str(GREYSKY_DIR))
 
 
 # =============================================================================
@@ -350,6 +354,26 @@ def run_pipeline(mode='daily', from_date=None, skip_download=False):
     started_at = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
     log = []
     total = len(PIPELINE_STEPS)
+
+    # Check if full codebase is available
+    if not HAS_FULL_CODEBASE:
+        missing = []
+        if not CHECKPOINT_DIR.exists():
+            missing.append(f'checkpoint_v8 ({CHECKPOINT_DIR})')
+        if not DATA_DIR.exists():
+            missing.append(f'data ({DATA_DIR})')
+        error_msg = (
+            f'Pipeline requires the full codebase. Missing: {", ".join(missing)}. '
+            f'Run the pipeline locally using run_daily.py, then deploy via git push.'
+        )
+        _write_status({
+            'state': 'error',
+            'mode': mode,
+            'error': error_msg,
+            'started_at': started_at,
+            'log': [f'[ERROR] {error_msg}'],
+        })
+        return
 
     _write_status({
         'state': 'running',
