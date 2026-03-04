@@ -136,109 +136,151 @@ def _rollback_data_to_date(target_date_str):
 # MID-DAY DATA DOWNLOAD (nsepython)
 # =============================================================================
 
+def _update_parquet(parquet_path, today, ohlcv):
+    """Update a single parquet file with today's price data.
+    ohlcv = dict with keys: Open, High, Low, Close, Volume
+    Returns True if updated successfully.
+    """
+    import pandas as pd
+    if not parquet_path.exists():
+        return False
+    df = pd.read_parquet(parquet_path)
+    if today not in df.index:
+        new_row = pd.DataFrame({
+            'Open': [ohlcv['Open']], 'High': [ohlcv['High']],
+            'Low': [ohlcv['Low']], 'Close': [ohlcv['Close']],
+            'Volume': [ohlcv['Volume']]
+        }, index=[today])
+        df = pd.concat([df, new_row])
+    else:
+        df.loc[today, 'Close'] = ohlcv['Close']
+        df.loc[today, 'High'] = max(df.loc[today, 'High'], ohlcv['High'])
+        df.loc[today, 'Low'] = min(df.loc[today, 'Low'], ohlcv['Low'])
+    df.to_parquet(parquet_path)
+    return True
+
+
 def _download_midday_data():
     """
-    Fetch near-real-time prices from NSE for portfolio stocks.
+    Fetch near-real-time prices for ALL constituent stocks + ETFs.
+    Uses batch yfinance download for speed (~338 stocks in ~30s).
     Appends/updates today's row in stock parquet files.
     Returns number of stocks updated.
     """
     import pandas as pd
 
     stock_dir = DATA_DIR / 'stocks'
+    etf_dir = DATA_DIR / 'etfs'
     today = pd.Timestamp(datetime.now().strftime('%Y-%m-%d'))
     updated = 0
 
-    # Get list of symbols from current signals
-    signals_path = DATA_DIR / 'current_signals.json'
-    if signals_path.exists():
-        signals = json.loads(signals_path.read_text(encoding='utf-8'))
-        symbols = [s['symbol'] for s in signals.get('portfolio', [])]
-    else:
-        # Fallback: load from constituents
-        const_path = DATA_DIR / 'nifty250_constituents.csv'
-        if const_path.exists():
-            import pandas as pd
-            df = pd.read_csv(const_path)
-            symbols = df['Symbol'].tolist()[:30]  # Top 30 only for speed
-        else:
-            return 0
+    # Get ALL stocks that have parquet files (full constituent universe)
+    # This matches what daily_update.py loads, preventing KeyError on missing dates
+    symbols = sorted([f.stem for f in stock_dir.glob('*.parquet')])
+    if not symbols:
+        return 0
 
+    # --- Try nsepython first (faster, real-time) ---
+    use_nse = False
     try:
         from nsepython import nse_quote_ltp
+        use_nse = True
     except ImportError:
-        # Fallback to yfinance if nsepython not available
+        pass
+
+    if use_nse:
+        for sym in symbols:
+            try:
+                ltp = nse_quote_ltp(sym)
+                if ltp and ltp > 0:
+                    if _update_parquet(stock_dir / f'{sym}.parquet', today,
+                                       {'Open': ltp, 'High': ltp, 'Low': ltp,
+                                        'Close': ltp, 'Volume': 0}):
+                        updated += 1
+            except Exception:
+                continue
+
+        # ETFs via nsepython
+        for nse_sym, filename in [('NIFTY 50', 'NIFTY50'), ('GOLDBEES', 'GOLDBEES')]:
+            try:
+                ltp = nse_quote_ltp(nse_sym)
+                if ltp and ltp > 0:
+                    _update_parquet(etf_dir / f'{filename}.parquet', today,
+                                    {'Open': ltp, 'High': ltp, 'Low': ltp,
+                                     'Close': ltp, 'Volume': 0})
+            except Exception:
+                continue
+
+    else:
+        # --- Fallback to yfinance batch download ---
         try:
             import yfinance as yf
-            for sym in symbols:
+
+            # Batch download all stocks at once (much faster than one-by-one)
+            tickers = [f"{sym}.NS" for sym in symbols]
+
+            # Download in batches of 100 to avoid API limits
+            BATCH_SIZE = 100
+            for batch_start in range(0, len(tickers), BATCH_SIZE):
+                batch_tickers = tickers[batch_start:batch_start + BATCH_SIZE]
+                batch_symbols = symbols[batch_start:batch_start + BATCH_SIZE]
+
                 try:
-                    ticker = yf.Ticker(f"{sym}.NS")
+                    data = yf.download(
+                        batch_tickers, period='1d',
+                        group_by='ticker', threads=True,
+                        progress=False
+                    )
+
+                    if data.empty:
+                        continue
+
+                    # Handle single-ticker case (no multi-level columns)
+                    if len(batch_tickers) == 1:
+                        sym = batch_symbols[0]
+                        if len(data) > 0:
+                            row = data.iloc[-1]
+                            if _update_parquet(stock_dir / f'{sym}.parquet', today,
+                                               {'Open': row['Open'], 'High': row['High'],
+                                                'Low': row['Low'], 'Close': row['Close'],
+                                                'Volume': int(row.get('Volume', 0))}):
+                                updated += 1
+                    else:
+                        # Multi-ticker: columns are (ticker, field)
+                        for sym, yf_ticker in zip(batch_symbols, batch_tickers):
+                            try:
+                                if yf_ticker not in data.columns.get_level_values(0):
+                                    continue
+                                stock_data = data[yf_ticker]
+                                if stock_data.empty or stock_data['Close'].isna().all():
+                                    continue
+                                row = stock_data.dropna(subset=['Close']).iloc[-1]
+                                if _update_parquet(stock_dir / f'{sym}.parquet', today,
+                                                   {'Open': row['Open'], 'High': row['High'],
+                                                    'Low': row['Low'], 'Close': row['Close'],
+                                                    'Volume': int(row.get('Volume', 0))}):
+                                    updated += 1
+                            except Exception:
+                                continue
+                except Exception:
+                    continue
+
+            # ETFs via yfinance
+            for yf_sym, filename in [('^NSEI', 'NIFTY50'), ('GOLDBEES.NS', 'GOLDBEES')]:
+                try:
+                    ticker = yf.Ticker(yf_sym)
                     hist = ticker.history(period='1d')
                     if len(hist) > 0:
                         row = hist.iloc[-1]
-                        parquet_path = stock_dir / f'{sym}.parquet'
-                        if parquet_path.exists():
-                            df = pd.read_parquet(parquet_path)
-                            if today not in df.index:
-                                new_row = pd.DataFrame({
-                                    'Open': [row['Open']], 'High': [row['High']],
-                                    'Low': [row['Low']], 'Close': [row['Close']],
-                                    'Volume': [int(row['Volume'])]
-                                }, index=[today])
-                                df = pd.concat([df, new_row])
-                            else:
-                                df.loc[today, 'Close'] = row['Close']
-                                df.loc[today, 'High'] = max(df.loc[today, 'High'], row['High'])
-                                df.loc[today, 'Low'] = min(df.loc[today, 'Low'], row['Low'])
-                            df.to_parquet(parquet_path)
-                            updated += 1
+                        _update_parquet(etf_dir / f'{filename}.parquet', today,
+                                        {'Open': row['Open'], 'High': row['High'],
+                                         'Low': row['Low'], 'Close': row['Close'],
+                                         'Volume': int(row.get('Volume', 0))})
                 except Exception:
                     continue
+
         except ImportError:
             pass
-        return updated
-
-    # Use nsepython for near-real-time NSE data
-    for sym in symbols:
-        try:
-            ltp = nse_quote_ltp(sym)
-            if ltp and ltp > 0:
-                parquet_path = stock_dir / f'{sym}.parquet'
-                if parquet_path.exists():
-                    df = pd.read_parquet(parquet_path)
-                    if today not in df.index:
-                        new_row = pd.DataFrame({
-                            'Open': [ltp], 'High': [ltp], 'Low': [ltp],
-                            'Close': [ltp], 'Volume': [0]
-                        }, index=[today])
-                        df = pd.concat([df, new_row])
-                    else:
-                        df.loc[today, 'Close'] = ltp
-                        df.loc[today, 'High'] = max(df.loc[today, 'High'], ltp)
-                        df.loc[today, 'Low'] = min(df.loc[today, 'Low'], ltp)
-                    df.to_parquet(parquet_path)
-                    updated += 1
-        except Exception:
-            continue
-
-    # Also update ETFs
-    for nse_sym, filename in [('NIFTY 50', 'NIFTY50'), ('GOLDBEES', 'GOLDBEES')]:
-        try:
-            ltp = nse_quote_ltp(nse_sym)
-            if ltp and ltp > 0:
-                parquet_path = DATA_DIR / 'etfs' / f'{filename}.parquet'
-                if parquet_path.exists():
-                    df = pd.read_parquet(parquet_path)
-                    if today not in df.index:
-                        new_row = pd.DataFrame({
-                            'Open': [ltp], 'High': [ltp], 'Low': [ltp],
-                            'Close': [ltp], 'Volume': [0]
-                        }, index=[today])
-                        df = pd.concat([df, new_row])
-                    else:
-                        df.loc[today, 'Close'] = ltp
-                    df.to_parquet(parquet_path)
-        except Exception:
-            continue
 
     return updated
 
@@ -283,6 +325,23 @@ def _run_step(step_key, mode='daily'):
             if result.returncode != 0:
                 return False, f'Portfolio update failed: {result.stderr[-500:]}'
             return True, 'Portfolio updated'
+
+        elif step_key == 'signals':
+            # Lightweight signals-only regeneration (for mid-day mode).
+            # Uses existing checkpoint + fresh prices to recompute signals
+            # WITHOUT processing new trading dates through walk-forward.
+            import subprocess
+            script = CHECKPOINT_DIR / 'regenerate_signals.py'
+            if not script.exists():
+                return False, f'regenerate_signals.py not found at {script}'
+            result = subprocess.run(
+                [sys.executable, str(script)],
+                cwd=str(CHECKPOINT_DIR), capture_output=True, text=True,
+                timeout=120, encoding='utf-8', errors='replace'
+            )
+            if result.returncode != 0:
+                return False, f'Signals failed: {result.stderr[-500:]}'
+            return True, 'Signals regenerated with latest prices'
 
         elif step_key == 'dashboard':
             import subprocess
@@ -475,6 +534,15 @@ PIPELINE_STEPS = [
     ('reload_remote', 'Reloading remote webapp'),
 ]
 
+# Mid-day mode: lighter pipeline — only fetch prices, regenerate signals, deploy
+MIDDAY_STEPS = [
+    ('download', 'Fetching latest prices'),
+    ('signals', 'Regenerating signals with live prices'),
+    ('copy', 'Copying files to web'),
+    ('deploy', 'Git commit & push'),
+    ('reload_remote', 'Reloading remote webapp'),
+]
+
 
 def run_pipeline(mode='daily', from_date=None, skip_download=False):
     """
@@ -486,7 +554,8 @@ def run_pipeline(mode='daily', from_date=None, skip_download=False):
     """
     started_at = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S')
     log = []
-    total = len(PIPELINE_STEPS)
+    steps = MIDDAY_STEPS if mode == 'midday' else PIPELINE_STEPS
+    total = len(steps)
 
     # Check if full codebase is available
     if not HAS_FULL_CODEBASE:
@@ -535,7 +604,7 @@ def run_pipeline(mode='daily', from_date=None, skip_download=False):
             log.append(f'[OK] Rolled back data to before {from_date}')
 
         # Run each step
-        for i, (step_key, step_name) in enumerate(PIPELINE_STEPS):
+        for i, (step_key, step_name) in enumerate(steps):
             # Skip download if requested
             if skip_download and step_key == 'download':
                 log.append(f'[SKIP] {step_name}')
@@ -553,7 +622,7 @@ def run_pipeline(mode='daily', from_date=None, skip_download=False):
             log.append(f'[{status_text}] {step_name}: {msg}')
 
             # Abort on critical failures
-            if not ok and step_key in ('download', 'portfolio'):
+            if not ok and step_key in ('download', 'portfolio', 'signals'):
                 raise RuntimeError(f'{step_name} failed: {msg}')
 
         _write_status({
