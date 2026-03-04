@@ -10,39 +10,45 @@
     "portfolio": [
         {
             "symbol": "SHRIRAMFIN",
-            "weight": 7.8,
+            "weight": 7.9,
             "sector": "",
-            "score": 0.76
+            "score": 0.87
         },
         {
             "symbol": "NATIONALUM",
             "weight": 5.6,
             "sector": "",
-            "score": 0.83
+            "score": 0.85
         },
         {
             "symbol": "AUBANK",
             "weight": 5.3,
             "sector": "",
-            "score": 0.7
+            "score": 0.72
         },
         {
             "symbol": "LTF",
             "weight": 5.0,
             "sector": "",
-            "score": 0.45
+            "score": 0.5
         },
         {
             "symbol": "CANBK",
             "weight": 5.0,
             "sector": "",
-            "score": 0.7
+            "score": 0.73
         },
         {
             "symbol": "SBILIFE",
-            "weight": 4.1,
+            "weight": 4.0,
             "sector": "",
-            "score": 0.54
+            "score": 0.46
+        },
+        {
+            "symbol": "INDUSTOWER",
+            "weight": 3.6,
+            "sector": "",
+            "score": 0.65
         },
         {
             "symbol": "COALINDIA",
@@ -51,52 +57,46 @@
             "score": 0.63
         },
         {
-            "symbol": "INDUSTOWER",
-            "weight": 3.6,
-            "sector": "",
-            "score": 0.63
-        },
-        {
             "symbol": "SBIN",
             "weight": 3.4,
             "sector": "",
-            "score": 0.61
+            "score": 0.63
         },
         {
             "symbol": "FEDERALBNK",
             "weight": 3.0,
             "sector": "",
-            "score": 0.67
+            "score": 0.69
         },
         {
             "symbol": "BRITANNIA",
             "weight": 2.2,
             "sector": "",
-            "score": 0.5
+            "score": 0.49
         },
         {
             "symbol": "NESTLEIND",
             "weight": 2.1,
             "sector": "",
-            "score": 0.39
+            "score": 0.4
         },
         {
             "symbol": "UNIONBANK",
             "weight": 2.1,
             "sector": "",
-            "score": 0.4
+            "score": 0.46
         },
         {
             "symbol": "HINDZINC",
             "weight": 2.0,
             "sector": "",
-            "score": 0.42
+            "score": 0.41
         },
         {
             "symbol": "MARICO",
             "weight": 1.4,
             "sector": "",
-            "score": 0.42
+            "score": 0.41
         },
         {
             "symbol": "EICHERMOT",
@@ -114,13 +114,13 @@
             "symbol": "NAM-INDIA",
             "weight": 1.1,
             "sector": "",
-            "score": 0.38
+            "score": 0.34
         },
         {
             "symbol": "BANKINDIA",
             "weight": 1.1,
             "sector": "",
-            "score": 0.61
+            "score": 0.63
         },
         {
             "symbol": "IDFCFIRSTB",
@@ -132,37 +132,37 @@
             "symbol": "BANKBARODA",
             "weight": 0.9,
             "sector": "",
-            "score": 0.6
+            "score": 0.58
         },
         {
             "symbol": "BSE",
             "weight": 0.8,
             "sector": "",
-            "score": 0.43
+            "score": 0.45
         },
         {
             "symbol": "INDIANB",
             "weight": 0.6,
             "sector": "",
-            "score": 0.62
+            "score": 0.61
         },
         {
             "symbol": "MUTHOOTFIN",
             "weight": 0.5,
             "sector": "",
-            "score": 0.25
+            "score": 0.26
         },
         {
             "symbol": "BEL",
             "weight": 0.4,
             "sector": "",
-            "score": 0.53
+            "score": 0.5
         },
         {
             "symbol": "AXISBANK",
             "weight": 0.4,
             "sector": "",
-            "score": 0.34
+            "score": 0.38
         },
         {
             "symbol": "MAHABANK",
@@ -174,7 +174,7 @@
             "symbol": "GVT&D",
             "weight": 0.1,
             "sector": "",
-            "score": 0.41
+            "score": 0.29
         },
         {
             "symbol": "HEROMOTOCO",
@@ -186,7 +186,7 @@
             "symbol": "NMDC",
             "weight": 0.1,
             "sector": "",
-            "score": 0.44
+            "score": 0.43
         },
         {
             "symbol": "TCS",
@@ -204,13 +204,13 @@
             "symbol": "HDFCAMC",
             "weight": 0.0,
             "sector": "",
-            "score": 0.49
+            "score": 0.51
         },
         {
             "symbol": "3MINDIA",
             "weight": 0.0,
             "sector": "",
-            "score": 0.3
+            "score": 0.29
         }
     ],
     "changes": {},
@@ -218,209 +218,201 @@
         {
             "action": "SELL",
             "symbol": "LTF",
-            "shares": 239.63,
-            "price": 270.0,
-            "value": 64636.0,
+            "shares": 210.13,
+            "price": 271.6,
+            "value": 57013.0,
             "reason": "Trim (weight decrease)"
         },
         {
             "action": "SELL",
             "symbol": "IDFCFIRSTB",
             "shares": 617.42,
-            "price": 70.14,
-            "value": 43306.0,
+            "price": 70.07,
+            "value": 43263.0,
             "reason": "Exit (dropped from top ranks)"
         },
         {
             "action": "SELL",
             "symbol": "GOLDBEES",
-            "shares": 302.71,
-            "price": 133.74,
-            "value": 40484.0,
+            "shares": 295.86,
+            "price": 133.67,
+            "value": 39548.0,
             "reason": "Gold rebalance"
-        },
-        {
-            "action": "SELL",
-            "symbol": "SHRIRAMFIN",
-            "shares": 38.14,
-            "price": 994.6,
-            "value": 37893.0,
-            "reason": "Trim (weight decrease)"
         },
         {
             "action": "SELL",
             "symbol": "EICHERMOT",
             "shares": 4.52,
-            "price": 7614.0,
-            "value": 34423.0,
+            "price": 7607.0,
+            "value": 34392.0,
             "reason": "Exit (dropped from top ranks)"
+        },
+        {
+            "action": "SELL",
+            "symbol": "SHRIRAMFIN",
+            "shares": 31.39,
+            "price": 1009.9,
+            "value": 31670.0,
+            "reason": "Trim (weight decrease)"
+        },
+        {
+            "action": "SELL",
+            "symbol": "SBILIFE",
+            "shares": 14.5,
+            "price": 1940.5,
+            "value": 28113.0,
+            "reason": "Trim (weight decrease)"
         },
         {
             "action": "SELL",
             "symbol": "BSE",
             "shares": 8.78,
-            "price": 2554.5,
-            "value": 22426.0,
+            "price": 2585.5,
+            "value": 22698.0,
             "reason": "Exit (dropped from top ranks)"
         },
         {
             "action": "SELL",
             "symbol": "TCS",
             "shares": 7.53,
-            "price": 2594.9,
-            "value": 19544.0,
+            "price": 2592.7,
+            "value": 19528.0,
             "reason": "Exit (dropped from top ranks)"
-        },
-        {
-            "action": "SELL",
-            "symbol": "SBILIFE",
-            "shares": 9.13,
-            "price": 1963.5,
-            "value": 17905.0,
-            "reason": "Trim (weight decrease)"
         },
         {
             "action": "SELL",
             "symbol": "HEROMOTOCO",
             "shares": 2.66,
-            "price": 5455.0,
-            "value": 14520.0,
+            "price": 5475.0,
+            "value": 14573.0,
             "reason": "Exit (dropped from top ranks)"
         },
         {
             "action": "SELL",
             "symbol": "NESTLEIND",
-            "shares": 9.76,
-            "price": 1250.9,
-            "value": 12191.0,
+            "shares": 5.67,
+            "price": 1250.4,
+            "value": 7078.0,
             "reason": "Trim (weight decrease)"
         },
         {
             "action": "SELL",
             "symbol": "SBIN",
-            "shares": 1.41,
-            "price": 1162.3,
-            "value": 1634.0,
-            "reason": "Trim (weight decrease)"
-        },
-        {
-            "action": "SELL",
-            "symbol": "HINDZINC",
-            "shares": 1.87,
-            "price": 592.15,
-            "value": 1104.0,
+            "shares": 1.31,
+            "price": 1163.0,
+            "value": 1526.0,
             "reason": "Trim (weight decrease)"
         },
         {
             "action": "BUY",
             "symbol": "BEL",
-            "shares": 108.49,
-            "price": 454.7,
-            "value": 49378.0,
+            "shares": 100.49,
+            "price": 447.3,
+            "value": 44993.0,
             "reason": "New entry"
         },
         {
             "action": "BUY",
             "symbol": "FEDERALBNK",
-            "shares": 159.33,
-            "price": 285.0,
-            "value": 45456.0,
+            "shares": 149.43,
+            "price": 284.6,
+            "value": 42569.0,
             "reason": "Add (weight increase)"
-        },
-        {
-            "action": "BUY",
-            "symbol": "NATIONALUM",
-            "shares": 78.48,
-            "price": 360.9,
-            "value": 28351.0,
-            "reason": "Add (weight increase)"
-        },
-        {
-            "action": "BUY",
-            "symbol": "GVT&D",
-            "shares": 7.5,
-            "price": 3752.5,
-            "value": 28189.0,
-            "reason": "New entry"
         },
         {
             "action": "BUY",
             "symbol": "UNIONBANK",
-            "shares": 144.25,
-            "price": 190.1,
-            "value": 27450.0,
-            "reason": "New entry"
-        },
-        {
-            "action": "BUY",
-            "symbol": "TORNTPHARM",
-            "shares": 4.22,
-            "price": 4298.2,
-            "value": 18176.0,
+            "shares": 207.16,
+            "price": 191.76,
+            "value": 39764.0,
             "reason": "New entry"
         },
         {
             "action": "BUY",
             "symbol": "AXISBANK",
-            "shares": 13.16,
-            "price": 1329.1,
-            "value": 17513.0,
+            "shares": 21.17,
+            "price": 1336.6,
+            "value": 28318.0,
             "reason": "New entry"
         },
         {
             "action": "BUY",
+            "symbol": "TORNTPHARM",
+            "shares": 5.42,
+            "price": 4310.0,
+            "value": 23390.0,
+            "reason": "New entry"
+        },
+        {
+            "action": "BUY",
+            "symbol": "NATIONALUM",
+            "shares": 57.75,
+            "price": 365.9,
+            "value": 21154.0,
+            "reason": "Add (weight increase)"
+        },
+        {
+            "action": "BUY",
             "symbol": "BRITANNIA",
-            "shares": 2.76,
-            "price": 5886.0,
-            "value": 16251.0,
+            "shares": 2.78,
+            "price": 5896.5,
+            "value": 16413.0,
+            "reason": "Add (weight increase)"
+        },
+        {
+            "action": "BUY",
+            "symbol": "GVT&D",
+            "shares": 3.96,
+            "price": 3640.9,
+            "value": 14432.0,
+            "reason": "New entry"
+        },
+        {
+            "action": "BUY",
+            "symbol": "MARICO",
+            "shares": 18.66,
+            "price": 770.35,
+            "value": 14393.0,
             "reason": "Add (weight increase)"
         },
         {
             "action": "BUY",
             "symbol": "INDUSTOWER",
-            "shares": 36.44,
-            "price": 431.8,
-            "value": 15749.0,
-            "reason": "Add (weight increase)"
-        },
-        {
-            "action": "BUY",
-            "symbol": "MARICO",
-            "shares": 17.08,
-            "price": 774.3,
-            "value": 13239.0,
-            "reason": "Add (weight increase)"
-        },
-        {
-            "action": "BUY",
-            "symbol": "COALINDIA",
-            "shares": 21.26,
-            "price": 436.95,
-            "value": 9297.0,
+            "shares": 32.6,
+            "price": 439.6,
+            "value": 14344.0,
             "reason": "Add (weight increase)"
         },
         {
             "action": "BUY",
             "symbol": "CANBK",
-            "shares": 56.5,
-            "price": 146.8,
-            "value": 8303.0,
+            "shares": 40.41,
+            "price": 146.89,
+            "value": 5942.0,
             "reason": "Add (weight increase)"
         },
         {
             "action": "BUY",
-            "symbol": "AUBANK",
-            "shares": 5.11,
-            "price": 938.45,
-            "value": 4801.0,
+            "symbol": "COALINDIA",
+            "shares": 12.18,
+            "price": 436.0,
+            "value": 5314.0,
             "reason": "Add (weight increase)"
         },
         {
             "action": "BUY",
             "symbol": "NAM-INDIA",
-            "shares": 4.97,
-            "price": 866.9,
-            "value": 4313.0,
+            "shares": 3.64,
+            "price": 858.3,
+            "value": 3126.0,
+            "reason": "Add (weight increase)"
+        },
+        {
+            "action": "BUY",
+            "symbol": "AUBANK",
+            "shares": 2.46,
+            "price": 938.5,
+            "value": 2312.0,
             "reason": "Add (weight increase)"
         }
     ],
