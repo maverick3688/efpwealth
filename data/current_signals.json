@@ -127,6 +127,79 @@
             "weight": 1.1,
             "sector": "",
             "score": 0.5
+        },
+        {
+            "symbol": "BANKBARODA",
+            "weight": 1.0,
+            "sector": "",
+            "score": 0.44
+        },
+        {
+            "symbol": "BSE",
+            "weight": 0.8,
+            "sector": "",
+            "score": 0
+        },
+        {
+            "symbol": "INDIANB",
+            "weight": 0.6,
+            "sector": "",
+            "score": 0.54
+        },
+        {
+            "symbol": "MUTHOOTFIN",
+            "weight": 0.5,
+            "sector": "",
+            "score": 0
+        },
+        {
+            "symbol": "AXISBANK",
+            "weight": 0.4,
+            "sector": "",
+            "score": 0.44
+        },
+        {
+            "symbol": "BEL",
+            "weight": 0.3,
+            "sector": "",
+            "score": 0.5
+        },
+        {
+            "symbol": "NMDC",
+            "weight": 0.1,
+            "sector": "",
+            "score": 0
+        },
+        {
+            "symbol": "TCS",
+            "weight": 0.1,
+            "sector": "",
+            "score": 0
+        },
+        {
+            "symbol": "MAHABANK",
+            "weight": 0.1,
+            "sector": "",
+            "score": 0
+        },
+        {
+            "symbol": "HEROMOTOCO",
+            "weight": 0.1,
+            "sector": "",
+            "score": 0
+        },
+        {
+            "symbol": "HDFCAMC",
+            "weight": 0.0,
+            "sector": "",
+            "score": 0
+        },
+        {
+            "symbol": "3MINDIA",
+            "weight": 0.0,
+            "sector": "",
+            "score": 0
         }
-    ]
+    ],
+    "changes": {}
 }
