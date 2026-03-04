@@ -1,15 +1,18 @@
 {
   "state": "running",
-  "mode": "midday",
-  "step": 4,
-  "total": 5,
+  "mode": "daily",
+  "step": 7,
+  "total": 8,
   "current_step": "Git commit & push",
-  "started_at": "2026-03-04 12:54:47",
+  "started_at": "2026-03-04 12:57:07",
   "log": [
     "[OK] Checkpoints backed up",
-    "[OK] Fetching latest prices: Updated 334 stock prices (mid-day)",
-    "[OK] Regenerating signals with live prices: Signals regenerated with latest prices",
+    "[OK] Downloading market data: Downloaded market data",
+    "[OK] Running portfolio update: Portfolio updated",
+    "[OK] Regenerating dashboard: Dashboard regenerated",
+    "[FAIL] Regenerating monthly report: Monthly report failed: d\n    result = super()._cmp_method(other, op)\n  File \"C:\\Users\\USER\\AppData\\Roaming\\Python\\Python314\\site-packages\\pandas\\core\\arrays\\arrow\\array.py\", line 949, in _cmp_method\n    result = ops.invalid_comparison(self, other, op)\n  File \"C:\\Users\\USER\\AppData\\Roaming\\Python\\Python314\\site-packages\\pandas\\core\\ops\\invalid.py\", line 55, in invalid_comparison\n    raise TypeError(f\"Invalid comparison between dtype={left.dtype} and {typ}\")\nTypeError: Invalid comparison between dtype=str and Timestamp\n",
+    "[OK] Regenerating site metrics: Site metrics regenerated",
     "[OK] Copying files to web: Copied 3 files to web/"
   ],
-  "updated_at": "2026-03-04 12:55:23"
+  "updated_at": "2026-03-04 12:57:46"
 }
