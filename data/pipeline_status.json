@@ -1,18 +1,15 @@
 {
-  "state": "completed",
+  "state": "running",
   "mode": "midday",
-  "step": 5,
+  "step": 4,
   "total": 5,
-  "current_step": "All steps completed",
-  "started_at": "2026-03-04 07:51:54",
-  "completed_at": "2026-03-04 07:52:41",
+  "current_step": "Git commit & push",
+  "started_at": "2026-03-04 08:39:34",
   "log": [
     "[OK] Checkpoints backed up",
     "[OK] Fetching latest prices: Updated 334 stock prices (mid-day)",
     "[OK] Regenerating signals with live prices: Signals regenerated with latest prices",
-    "[OK] Copying files to web: Copied 3 files to web/",
-    "[OK] Git commit & push: Deployed to remote (Daily update 2026-03-04 (midday))",
-    "[OK] Reloading remote webapp: Skipped remote reload (incomplete pa_config.json)"
+    "[OK] Copying files to web: Copied 3 files to web/"
   ],
-  "updated_at": "2026-03-04 07:52:41"
+  "updated_at": "2026-03-04 08:40:02"
 }
