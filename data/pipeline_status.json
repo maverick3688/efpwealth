@@ -1,18 +1,15 @@
 {
   "state": "running",
   "mode": "midday",
-  "step": 7,
-  "total": 8,
+  "step": 4,
+  "total": 5,
   "current_step": "Git commit & push",
-  "started_at": "2026-03-04 03:57:53",
+  "started_at": "2026-03-04 04:27:03",
   "log": [
     "[OK] Checkpoints backed up",
-    "[OK] Downloading market data: Updated 32 stock prices (mid-day)",
-    "[OK] Running portfolio update: Portfolio updated",
-    "[OK] Regenerating dashboard: Dashboard regenerated",
-    "[OK] Regenerating monthly report: Monthly report regenerated",
-    "[OK] Regenerating site metrics: Site metrics regenerated",
+    "[OK] Fetching latest prices: Updated 32 stock prices (mid-day)",
+    "[OK] Regenerating signals with live prices: Signals regenerated with latest prices",
     "[OK] Copying files to web: Copied 3 files to web/"
   ],
-  "updated_at": "2026-03-04 03:58:41"
+  "updated_at": "2026-03-04 04:27:23"
 }
