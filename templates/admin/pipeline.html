@@ -1,0 +1,195 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Pipeline — Admin — EFP Wealth{% endblock %}
+
+{% block admin_content %}
+<h2>Pipeline Control</h2>
+
+<!-- Current Status -->
+<div class="pipeline-card" id="status-card">
+    <h4>
+        <span class="status-dot {{ pipeline_status.state|default('idle') }}" id="status-dot"></span>
+        <span id="status-title">
+            {% if pipeline_status.state == 'running' %}
+                Running...
+            {% elif pipeline_status.state == 'completed' %}
+                Last Run Completed
+            {% elif pipeline_status.state == 'error' %}
+                Last Run Failed
+            {% else %}
+                Pipeline Idle
+            {% endif %}
+        </span>
+    </h4>
+    <p id="status-detail">
+        {% if pipeline_status.state == 'running' %}
+            Step {{ pipeline_status.step }}/{{ pipeline_status.total }}: {{ pipeline_status.current_step }}
+        {% elif pipeline_status.state == 'completed' %}
+            Completed at {{ pipeline_status.completed_at }} ({{ pipeline_status.mode|default('daily') }} mode)
+        {% elif pipeline_status.state == 'error' %}
+            {{ pipeline_status.error }}
+        {% else %}
+            Last update: {{ last_update }}
+        {% endif %}
+    </p>
+    <div class="pipeline-progress" id="progress-bar" style="{% if pipeline_status.state != 'running' %}display:none;{% endif %}">
+        <div class="pipeline-progress-fill" id="progress-fill" style="width: {% if pipeline_status.state == 'running' and pipeline_status.total > 0 %}{{ (pipeline_status.step / pipeline_status.total * 100)|int }}{% else %}0{% endif %}%"></div>
+    </div>
+
+    <!-- Pipeline Log -->
+    <div class="pipeline-log" id="pipeline-log" style="{% if not pipeline_status.log %}display:none;{% endif %}">
+        {% if pipeline_status.log %}
+            {% for line in pipeline_status.log %}
+                <div class="log-line {% if '[OK]' in line %}log-ok{% elif '[FAIL]' in line or '[ERROR]' in line %}log-fail{% elif '[SKIP]' in line %}log-skip{% endif %}">{{ line }}</div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
+
+<!-- Run Daily Update -->
+<div class="pipeline-card">
+    <h4>Run Daily Update</h4>
+    <p>Download latest market data and run the full portfolio update pipeline.</p>
+    <form method="POST" action="{{ url_for('admin.pipeline_run') }}" id="daily-form">
+        <input type="hidden" name="mode" value="daily">
+        <div style="margin-bottom:12px;">
+            <label style="font-size:13px;color:#475569;cursor:pointer;">
+                <input type="checkbox" name="skip_download"> Skip data download (use existing data)
+            </label>
+        </div>
+        <button type="submit" class="btn-sm btn-gold" id="btn-daily">Run Daily Update</button>
+    </form>
+</div>
+
+<!-- Re-run from Date -->
+<div class="pipeline-card">
+    <h4>Re-run from Date</h4>
+    <p>Roll back to a specific date and re-process all days from that point forward. Use this when you need to re-run a previous day's update.</p>
+    <form method="POST" action="{{ url_for('admin.pipeline_run') }}" id="rerun-form">
+        <input type="hidden" name="mode" value="rerun">
+        <div class="form-row">
+            <div class="form-group">
+                <label>Start Date</label>
+                <input type="date" name="from_date" required style="padding:8px 12px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;">
+            </div>
+            <div>
+                <button type="submit" class="btn-sm btn-gold" id="btn-rerun">Re-run from Date</button>
+            </div>
+        </div>
+    </form>
+    <p style="font-size:12px;color:#94a3b8;margin-top:4px;">
+        All dates from the selected date onward will be reprocessed. Checkpoint backups will be restored.
+    </p>
+</div>
+
+<!-- Mid-day Update -->
+<div class="pipeline-card">
+    <h4>Mid-day Update</h4>
+    <p>Fetch near-real-time market prices and update the portfolio with current data. Use this to get same-day updates before market close.</p>
+    <form method="POST" action="{{ url_for('admin.pipeline_run') }}" id="midday-form">
+        <input type="hidden" name="mode" value="midday">
+        <button type="submit" class="btn-sm btn-gold" id="btn-midday">Fetch Latest Prices</button>
+    </form>
+</div>
+
+<script>
+(function() {
+    let polling = {{ 'true' if pipeline_status.state == 'running' else 'false' }};
+    let pollInterval = null;
+
+    // Disable all submit buttons if pipeline is running
+    function setButtonsDisabled(disabled) {
+        document.querySelectorAll('#daily-form button, #rerun-form button, #midday-form button').forEach(btn => {
+            btn.disabled = disabled;
+            btn.style.opacity = disabled ? '0.5' : '1';
+        });
+    }
+
+    function updateStatus(data) {
+        const dot = document.getElementById('status-dot');
+        const title = document.getElementById('status-title');
+        const detail = document.getElementById('status-detail');
+        const progressBar = document.getElementById('progress-bar');
+        const progressFill = document.getElementById('progress-fill');
+        const logDiv = document.getElementById('pipeline-log');
+
+        // Update dot
+        dot.className = 'status-dot ' + (data.state || 'idle');
+
+        // Update title
+        if (data.state === 'running') {
+            title.textContent = 'Running...';
+            progressBar.style.display = '';
+            progressFill.style.width = (data.total > 0 ? Math.round(data.step / data.total * 100) : 0) + '%';
+            detail.textContent = 'Step ' + data.step + '/' + data.total + ': ' + data.current_step;
+            setButtonsDisabled(true);
+        } else if (data.state === 'completed') {
+            title.textContent = 'Last Run Completed';
+            progressBar.style.display = 'none';
+            detail.textContent = 'Completed at ' + data.completed_at + ' (' + (data.mode || 'daily') + ' mode)';
+            setButtonsDisabled(false);
+            stopPolling();
+        } else if (data.state === 'error') {
+            title.textContent = 'Last Run Failed';
+            progressBar.style.display = 'none';
+            detail.textContent = data.error || 'Unknown error';
+            detail.style.color = '#dc2626';
+            setButtonsDisabled(false);
+            stopPolling();
+        } else {
+            title.textContent = 'Pipeline Idle';
+            progressBar.style.display = 'none';
+            setButtonsDisabled(false);
+            stopPolling();
+        }
+
+        // Update log
+        if (data.log && data.log.length > 0) {
+            logDiv.style.display = '';
+            logDiv.innerHTML = data.log.map(function(line) {
+                let cls = '';
+                if (line.indexOf('[OK]') !== -1) cls = 'log-ok';
+                else if (line.indexOf('[FAIL]') !== -1 || line.indexOf('[ERROR]') !== -1) cls = 'log-fail';
+                else if (line.indexOf('[SKIP]') !== -1) cls = 'log-skip';
+                return '<div class="log-line ' + cls + '">' + line + '</div>';
+            }).join('');
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+    }
+
+    function pollStatus() {
+        fetch('{{ url_for("admin.pipeline_status") }}')
+            .then(r => r.json())
+            .then(data => updateStatus(data))
+            .catch(() => {});
+    }
+
+    function startPolling() {
+        if (!polling) {
+            polling = true;
+            pollInterval = setInterval(pollStatus, 2000);
+        }
+    }
+
+    function stopPolling() {
+        polling = false;
+        if (pollInterval) {
+            clearInterval(pollInterval);
+            pollInterval = null;
+        }
+    }
+
+    // Start polling on form submit
+    document.querySelectorAll('#daily-form, #rerun-form, #midday-form').forEach(form => {
+        form.addEventListener('submit', function() {
+            setTimeout(startPolling, 1000);
+        });
+    });
+
+    // Auto-start polling if already running
+    if (polling) {
+        pollInterval = setInterval(pollStatus, 2000);
+        setButtonsDisabled(true);
+    }
+})();
+</script>
+{% endblock %}

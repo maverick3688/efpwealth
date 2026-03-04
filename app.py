@@ -9,11 +9,12 @@ from pathlib import Path
 from datetime import datetime, timezone
 from functools import wraps
 
-from flask import Flask, render_template, redirect, url_for, request, flash, send_from_directory
+from flask import Flask, render_template, redirect, url_for, request, flash, send_from_directory, abort
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import bcrypt
 
 from models import db, User, CapitalRecord, Referral, generate_referral_code
+from admin import admin_bp
 
 # --- Config ---
 BASE_DIR = Path(__file__).parent
@@ -41,6 +42,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{BASE_DIR / "efpwealth.db"}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
+app.register_blueprint(admin_bp)
+
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 login_manager.login_message = 'Please log in to access this page.'
@@ -321,6 +324,13 @@ def referral_invite():
     return redirect(url_for('dashboard'))
 
 
+# --- Error Handlers ---
+
+@app.errorhandler(403)
+def forbidden(e):
+    return render_template('403.html'), 403
+
+
 # --- CLI Commands ---
 
 @app.cli.command('init-db')
@@ -403,6 +413,32 @@ def add_capital_cmd():
     db.session.commit()
     pnl = current_value - invested
     print(f'Capital record added for {user.name}: {invested:,.0f} invested, {current_value:,.0f} value, P&L {pnl:+,.0f} on {date_str}')
+
+
+@app.cli.command('add-admin-column')
+def add_admin_column():
+    """Add is_admin column to users table (one-time migration)."""
+    from sqlalchemy import text
+    with db.engine.connect() as conn:
+        try:
+            conn.execute(text("ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT 0"))
+            conn.commit()
+            print("Added is_admin column to users table.")
+        except Exception as e:
+            print(f"Column may already exist: {e}")
+
+
+@app.cli.command('make-admin')
+def make_admin_cmd():
+    """Promote a user to admin by email (interactive)."""
+    email = input('Email to make admin: ').strip().lower()
+    user = User.query.filter_by(email=email).first()
+    if user:
+        user.is_admin = True
+        db.session.commit()
+        print(f'Admin granted: {user.name} ({user.email})')
+    else:
+        print(f'User not found: {email}')
 
 
 # --- Init ---

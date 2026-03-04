@@ -1,0 +1,82 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Admin — EFP Wealth{% endblock %}
+
+{% block admin_content %}
+<h2>Overview</h2>
+
+<div class="admin-stat-grid">
+    <div class="admin-stat-card">
+        <div class="admin-stat-val">{{ total_users }}</div>
+        <div class="admin-stat-label">Total Users</div>
+    </div>
+    <div class="admin-stat-card">
+        <div class="admin-stat-val" style="color:#C59A2C;">{{ pending_users }}</div>
+        <div class="admin-stat-label">Pending Approval</div>
+    </div>
+    <div class="admin-stat-card">
+        <div class="admin-stat-val" style="color:#16a34a;">{{ approved_users }}</div>
+        <div class="admin-stat-label">Approved</div>
+    </div>
+    <div class="admin-stat-card">
+        <div class="admin-stat-val" style="font-size:16px;">{{ last_update }}</div>
+        <div class="admin-stat-label">Last Update</div>
+    </div>
+</div>
+
+<!-- Pipeline Status -->
+<div class="pipeline-card">
+    <h4>
+        <span class="status-dot {{ pipeline_status.state|default('idle') }}"></span>
+        Pipeline Status
+    </h4>
+    {% if pipeline_status.state == 'running' %}
+        <p>Step {{ pipeline_status.step }}/{{ pipeline_status.total }}: {{ pipeline_status.current_step }}</p>
+        <div class="pipeline-progress">
+            <div class="pipeline-progress-fill" style="width: {{ (pipeline_status.step / pipeline_status.total * 100)|int }}%"></div>
+        </div>
+    {% elif pipeline_status.state == 'completed' %}
+        <p style="color:#16a34a;">Completed at {{ pipeline_status.completed_at }}</p>
+    {% elif pipeline_status.state == 'error' %}
+        <p style="color:#dc2626;">Error: {{ pipeline_status.error }}</p>
+    {% else %}
+        <p>Idle — no pipeline running</p>
+    {% endif %}
+    <a href="{{ url_for('admin.pipeline') }}" class="btn-sm btn-outline" style="margin-top:8px;">Go to Pipeline &rarr;</a>
+</div>
+
+<!-- Pending Users Quick List -->
+{% if pending_list %}
+<div class="pipeline-card">
+    <h4>Pending Approvals</h4>
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Registered</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in pending_list %}
+            <tr>
+                <td><strong>{{ user.name }}</strong></td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.created_at.strftime('%d %b %Y') if user.created_at else '—' }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('admin.approve_user', user_id=user.id) }}" class="inline-form">
+                        <input type="hidden" name="next" value="{{ url_for('admin.dashboard') }}">
+                        <button type="submit" class="btn-sm btn-approve">Approve</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if pending_users > 5 %}
+    <a href="{{ url_for('admin.users') }}" style="font-size:13px;margin-top:12px;display:inline-block;">View all {{ pending_users }} pending &rarr;</a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% endblock %}

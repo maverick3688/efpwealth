@@ -55,6 +55,9 @@ a:hover { text-decoration: underline; }
                 <a href="/analytics">Analytics</a>
                 <a href="/monthly-report">Monthly Report</a>
                 <a href="/performance">Performance</a>
+                {% if current_user.is_admin %}
+                <a href="/admin" style="color:#C59A2C;font-weight:600;">Admin</a>
+                {% endif %}
                 <a href="/logout">Logout</a>
             {% else %}
                 <a href="/">Home</a>

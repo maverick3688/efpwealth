@@ -1,0 +1,78 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}Users — Admin — EFP Wealth{% endblock %}
+
+{% block admin_content %}
+<h2>User Management</h2>
+
+<div class="admin-stat-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom:24px;">
+    <div class="admin-stat-card">
+        <div class="admin-stat-val">{{ users|length }}</div>
+        <div class="admin-stat-label">Total</div>
+    </div>
+    <div class="admin-stat-card">
+        <div class="admin-stat-val" style="color:#16a34a;">{{ users|selectattr('approved')|list|length }}</div>
+        <div class="admin-stat-label">Approved</div>
+    </div>
+    <div class="admin-stat-card">
+        <div class="admin-stat-val" style="color:#C59A2C;">{{ users|rejectattr('approved')|list|length }}</div>
+        <div class="admin-stat-label">Pending</div>
+    </div>
+</div>
+
+<table class="admin-table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Status</th>
+            <th>KYC</th>
+            <th>Registered</th>
+            <th>Terms</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        <tr>
+            <td>
+                <strong>{{ user.name }}</strong>
+                {% if user.is_admin %}
+                    <span class="badge badge-admin" style="margin-left:6px;">Admin</span>
+                {% endif %}
+            </td>
+            <td>{{ user.email }}</td>
+            <td>
+                {% if user.approved %}
+                    <span class="badge badge-approved">Approved</span>
+                {% else %}
+                    <span class="badge badge-pending">Pending</span>
+                {% endif %}
+            </td>
+            <td>{{ user.kyc_status|default('—') }}</td>
+            <td>{{ user.created_at.strftime('%d %b %Y') if user.created_at else '—' }}</td>
+            <td>
+                {% if user.terms_accepted_at %}
+                    v{{ user.terms_version }}
+                {% else %}
+                    <span style="color:#94a3b8;">—</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if not user.approved %}
+                    <form method="POST" action="{{ url_for('admin.approve_user', user_id=user.id) }}" class="inline-form">
+                        <button type="submit" class="btn-sm btn-approve">Approve</button>
+                    </form>
+                {% elif user.id != current_user.id %}
+                    <form method="POST" action="{{ url_for('admin.revoke_user', user_id=user.id) }}" class="inline-form"
+                          onsubmit="return confirm('Revoke access for {{ user.name }}?')">
+                        <button type="submit" class="btn-sm btn-revoke">Revoke</button>
+                    </form>
+                {% else %}
+                    <span style="color:#94a3b8;font-size:12px;">You</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
