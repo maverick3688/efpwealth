@@ -461,53 +461,74 @@ def _run_step(step_key, mode='daily'):
 
             import urllib.request
             import urllib.error
+            import time
             headers = {'Authorization': f'Token {pa_token}'}
+            pull_ok = False
 
-            # 1. Run git pull via PythonAnywhere API (create console + run command)
+            # 1. Git pull via console API
             try:
-                # Use the files API to trigger a bash command via console
-                pull_url = f'https://www.pythonanywhere.com/api/v0/user/{pa_user}/consoles/'
-                pull_data = json.dumps({
-                    'executable': 'bash',
-                    'arguments': '',
-                    'working_directory': f'/home/{pa_user}/efpwealth'
-                }).encode('utf-8')
-                req = urllib.request.Request(pull_url, data=pull_data, headers={
-                    **headers, 'Content-Type': 'application/json'
-                }, method='POST')
-                resp = urllib.request.urlopen(req, timeout=30)
-                console_info = json.loads(resp.read().decode('utf-8'))
-                console_id = console_info.get('id')
+                # List existing consoles — reuse one if available
+                list_url = f'https://www.pythonanywhere.com/api/v0/user/{pa_user}/consoles/'
+                req = urllib.request.Request(list_url, headers=headers)
+                resp = urllib.request.urlopen(req, timeout=15)
+                consoles = json.loads(resp.read().decode('utf-8'))
+
+                console_id = None
+                created_console = False
+
+                # Prefer reusing an existing bash console
+                for c in consoles:
+                    if 'bash' in c.get('executable', '').lower():
+                        console_id = c['id']
+                        break
+
+                # No existing console — create one
+                if not console_id:
+                    create_data = json.dumps({
+                        'executable': 'bash',
+                        'arguments': '',
+                        'working_directory': f'/home/{pa_user}/efpwealth'
+                    }).encode('utf-8')
+                    req = urllib.request.Request(list_url, data=create_data, headers={
+                        **headers, 'Content-Type': 'application/json'
+                    }, method='POST')
+                    resp = urllib.request.urlopen(req, timeout=30)
+                    body = resp.read().decode('utf-8')
+                    if body.strip():
+                        info = json.loads(body)
+                        console_id = info.get('id')
+                        created_console = True
 
                 if console_id:
-                    # Send git pull command
                     send_url = f'https://www.pythonanywhere.com/api/v0/user/{pa_user}/consoles/{console_id}/send_input/'
-                    send_data = json.dumps({
-                        'input': f'cd /home/{pa_user}/efpwealth && git pull origin master\n'
-                    }).encode('utf-8')
+                    cmd = f'cd /home/{pa_user}/efpwealth && git pull origin master\n'
+                    send_data = json.dumps({'input': cmd}).encode('utf-8')
                     req = urllib.request.Request(send_url, data=send_data, headers={
                         **headers, 'Content-Type': 'application/json'
                     }, method='POST')
                     urllib.request.urlopen(req, timeout=30)
+                    time.sleep(8)  # wait for pull to finish
+                    pull_ok = True
 
-                    # Wait a bit for pull to complete
-                    import time
-                    time.sleep(5)
-
-                    # Kill the console
-                    kill_url = f'https://www.pythonanywhere.com/api/v0/user/{pa_user}/consoles/{console_id}/'
-                    req = urllib.request.Request(kill_url, headers=headers, method='DELETE')
-                    urllib.request.urlopen(req, timeout=10)
+                    # Clean up only if we created a new console
+                    if created_console:
+                        try:
+                            kill_url = f'https://www.pythonanywhere.com/api/v0/user/{pa_user}/consoles/{console_id}/'
+                            req = urllib.request.Request(kill_url, headers=headers, method='DELETE')
+                            urllib.request.urlopen(req, timeout=10)
+                        except Exception:
+                            pass
             except Exception as e:
-                # Non-fatal: log but continue to reload
-                log_msg = f'Git pull warning: {str(e)}'
+                # Non-fatal: continue to reload (code was already pushed)
+                pull_ok = False
 
             # 2. Reload webapp
             try:
                 reload_url = f'https://www.pythonanywhere.com/api/v0/user/{pa_user}/webapps/{pa_domain}/reload/'
                 req = urllib.request.Request(reload_url, data=b'', headers=headers, method='POST')
                 resp = urllib.request.urlopen(req, timeout=30)
-                return True, f'Remote reloaded ({pa_domain})'
+                pull_note = 'pulled + ' if pull_ok else 'pull skipped, '
+                return True, f'Remote {pull_note}reloaded ({pa_domain})'
             except urllib.error.HTTPError as e:
                 return False, f'Reload failed: HTTP {e.code} - {e.read().decode("utf-8", errors="replace")}'
             except Exception as e:
