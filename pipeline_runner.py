@@ -257,49 +257,73 @@ def _run_step(step_key, mode='daily'):
                 n = _download_midday_data()
                 return True, f'Updated {n} stock prices (mid-day)'
             else:
-                os.chdir(str(GREYSKY_DIR))
-                import download_data
-                # Reload module in case it was imported before with stale state
-                import importlib
-                importlib.reload(download_data)
-                symbols, _ = download_data.download_constituents()
-                download_data.download_stock_data(symbols)
-                download_data.download_etf_and_index_data()
-                return True, f'Downloaded data for {len(symbols)} stocks + ETFs'
+                import subprocess
+                script = GREYSKY_DIR / 'download_data.py'
+                if not script.exists():
+                    return False, f'download_data.py not found at {script}'
+                result = subprocess.run(
+                    [sys.executable, str(script)],
+                    cwd=str(GREYSKY_DIR), capture_output=True, text=True,
+                    timeout=120, encoding='utf-8', errors='replace'
+                )
+                if result.returncode != 0:
+                    return False, f'Download failed: {result.stderr[-500:]}'
+                return True, 'Downloaded market data'
 
         elif step_key == 'portfolio':
-            os.chdir(str(CHECKPOINT_DIR))
-            import daily_update
-            import importlib
-            importlib.reload(daily_update)
-            daily_update.run_daily_update(dry_run=False)
+            import subprocess
+            script = CHECKPOINT_DIR / 'daily_update.py'
+            if not script.exists():
+                return False, f'daily_update.py not found at {script}'
+            result = subprocess.run(
+                [sys.executable, str(script)],
+                cwd=str(CHECKPOINT_DIR), capture_output=True, text=True,
+                timeout=300, encoding='utf-8', errors='replace'
+            )
+            if result.returncode != 0:
+                return False, f'Portfolio update failed: {result.stderr[-500:]}'
             return True, 'Portfolio updated'
 
         elif step_key == 'dashboard':
-            os.chdir(str(CHECKPOINT_DIR))
-            import generate_dashboard
-            import importlib
-            importlib.reload(generate_dashboard)
-            generate_dashboard.generate_dashboard()
+            import subprocess
+            script = CHECKPOINT_DIR / 'generate_dashboard.py'
+            if not script.exists():
+                return True, 'Dashboard script not found (skipped)'
+            result = subprocess.run(
+                [sys.executable, str(script)],
+                cwd=str(CHECKPOINT_DIR), capture_output=True, text=True,
+                timeout=120, encoding='utf-8', errors='replace'
+            )
+            if result.returncode != 0:
+                return False, f'Dashboard failed: {result.stderr[-500:]}'
             return True, 'Dashboard regenerated'
 
         elif step_key == 'monthly':
-            monthly_script = GREYSKY_DIR / 'generate_monthly_report.py'
-            if monthly_script.exists():
-                os.chdir(str(GREYSKY_DIR))
-                import generate_monthly_report
-                import importlib
-                importlib.reload(generate_monthly_report)
-                generate_monthly_report.generate()
-                return True, 'Monthly report regenerated'
-            return True, 'Monthly report skipped (script not found)'
+            import subprocess
+            script = GREYSKY_DIR / 'generate_monthly_report.py'
+            if not script.exists():
+                return True, 'Monthly report script not found (skipped)'
+            result = subprocess.run(
+                [sys.executable, str(script)],
+                cwd=str(GREYSKY_DIR), capture_output=True, text=True,
+                timeout=120, encoding='utf-8', errors='replace'
+            )
+            if result.returncode != 0:
+                return False, f'Monthly report failed: {result.stderr[-500:]}'
+            return True, 'Monthly report regenerated'
 
         elif step_key == 'metrics':
-            os.chdir(str(WEB_DIR))
-            import generate_site_data
-            import importlib
-            importlib.reload(generate_site_data)
-            generate_site_data.generate()
+            import subprocess
+            script = WEB_DIR / 'generate_site_data.py'
+            if not script.exists():
+                return True, 'Site metrics script not found (skipped)'
+            result = subprocess.run(
+                [sys.executable, str(script)],
+                cwd=str(WEB_DIR), capture_output=True, text=True,
+                timeout=60, encoding='utf-8', errors='replace'
+            )
+            if result.returncode != 0:
+                return False, f'Site metrics failed: {result.stderr[-500:]}'
             return True, 'Site metrics regenerated'
 
         elif step_key == 'copy':
@@ -317,11 +341,118 @@ def _run_step(step_key, mode='daily'):
             return True, f'Copied {copied} files to web/'
 
         elif step_key == 'deploy':
-            # On PythonAnywhere, files are already in the right place
-            # On local, this would do git commit+push
-            return True, 'Deploy step (files already in place)'
+            import subprocess
+            today = datetime.now().strftime('%Y-%m-%d')
 
-        return False, f'Unknown step: {step_key}'
+            # Stage changed web files
+            files_to_stage = [
+                'static/dashboard.html', 'static/monthly_report.html',
+                'data/site_metrics.json', 'data/current_signals.json',
+                'data/pipeline_status.json',
+            ]
+            subprocess.run(
+                ['git', 'add'] + files_to_stage,
+                cwd=str(WEB_DIR), capture_output=True, text=True,
+                encoding='utf-8', errors='replace'
+            )
+
+            # Check if there are changes to commit
+            status_result = subprocess.run(
+                ['git', 'status', '--porcelain'],
+                cwd=str(WEB_DIR), capture_output=True, text=True,
+                encoding='utf-8', errors='replace'
+            )
+            if not status_result.stdout.strip():
+                return True, 'No changes to deploy'
+
+            # Commit
+            commit_msg = f'Daily update {today} ({mode})'
+            result = subprocess.run(
+                ['git', 'commit', '-m', commit_msg],
+                cwd=str(WEB_DIR), capture_output=True, text=True,
+                encoding='utf-8', errors='replace'
+            )
+            if result.returncode != 0:
+                return False, f'Git commit failed: {result.stderr}'
+
+            # Push to remote
+            result = subprocess.run(
+                ['git', 'push'],
+                cwd=str(WEB_DIR), capture_output=True, text=True,
+                timeout=60, encoding='utf-8', errors='replace'
+            )
+            if result.returncode != 0:
+                return False, f'Git push failed: {result.stderr}'
+
+            return True, f'Deployed to remote ({commit_msg})'
+
+        elif step_key == 'reload_remote':
+            # Pull changes and reload webapp on PythonAnywhere via API
+            config_path = WEB_DIR / 'pa_config.json'
+            if not config_path.exists():
+                return True, 'Skipped remote reload (no pa_config.json)'
+
+            config = json.loads(config_path.read_text(encoding='utf-8'))
+            pa_user = config.get('username', '')
+            pa_token = config.get('api_token', '')
+            pa_domain = config.get('domain', '')
+
+            if not all([pa_user, pa_token, pa_domain]):
+                return True, 'Skipped remote reload (incomplete pa_config.json)'
+
+            import urllib.request
+            import urllib.error
+            headers = {'Authorization': f'Token {pa_token}'}
+
+            # 1. Run git pull via PythonAnywhere API (create console + run command)
+            try:
+                # Use the files API to trigger a bash command via console
+                pull_url = f'https://www.pythonanywhere.com/api/v0/user/{pa_user}/consoles/'
+                pull_data = json.dumps({
+                    'executable': 'bash',
+                    'arguments': '',
+                    'working_directory': f'/home/{pa_user}/efpwealth'
+                }).encode('utf-8')
+                req = urllib.request.Request(pull_url, data=pull_data, headers={
+                    **headers, 'Content-Type': 'application/json'
+                }, method='POST')
+                resp = urllib.request.urlopen(req, timeout=30)
+                console_info = json.loads(resp.read().decode('utf-8'))
+                console_id = console_info.get('id')
+
+                if console_id:
+                    # Send git pull command
+                    send_url = f'https://www.pythonanywhere.com/api/v0/user/{pa_user}/consoles/{console_id}/send_input/'
+                    send_data = json.dumps({
+                        'input': f'cd /home/{pa_user}/efpwealth && git pull origin master\n'
+                    }).encode('utf-8')
+                    req = urllib.request.Request(send_url, data=send_data, headers={
+                        **headers, 'Content-Type': 'application/json'
+                    }, method='POST')
+                    urllib.request.urlopen(req, timeout=30)
+
+                    # Wait a bit for pull to complete
+                    import time
+                    time.sleep(5)
+
+                    # Kill the console
+                    kill_url = f'https://www.pythonanywhere.com/api/v0/user/{pa_user}/consoles/{console_id}/'
+                    req = urllib.request.Request(kill_url, headers=headers, method='DELETE')
+                    urllib.request.urlopen(req, timeout=10)
+            except Exception as e:
+                # Non-fatal: log but continue to reload
+                log_msg = f'Git pull warning: {str(e)}'
+
+            # 2. Reload webapp
+            try:
+                reload_url = f'https://www.pythonanywhere.com/api/v0/user/{pa_user}/webapps/{pa_domain}/reload/'
+                req = urllib.request.Request(reload_url, data=b'', headers=headers, method='POST')
+                resp = urllib.request.urlopen(req, timeout=30)
+                return True, f'Remote reloaded ({pa_domain})'
+            except urllib.error.HTTPError as e:
+                return False, f'Reload failed: HTTP {e.code} - {e.read().decode("utf-8", errors="replace")}'
+            except Exception as e:
+                return False, f'Reload failed: {str(e)}'
 
     except Exception as e:
         return False, f'{str(e)}\n{traceback.format_exc()}'
@@ -340,6 +471,8 @@ PIPELINE_STEPS = [
     ('monthly', 'Regenerating monthly report'),
     ('metrics', 'Regenerating site metrics'),
     ('copy', 'Copying files to web'),
+    ('deploy', 'Git commit & push'),
+    ('reload_remote', 'Reloading remote webapp'),
 ]
 
 

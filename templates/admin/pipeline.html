@@ -5,12 +5,22 @@
 <h2>Pipeline Control</h2>
 
 {% if not has_full_codebase %}
-<div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:16px 20px;margin-bottom:20px;">
-    <strong style="color:#92400e;">Limited Mode</strong>
-    <p style="color:#92400e;font-size:13px;margin:4px 0 0;">
-        Pipeline execution requires the full codebase (checkpoint_v8 + data directories).
-        Run the pipeline locally using <code>run_daily.py</code>, then deploy via <code>git push</code>.
-        The status viewer below will show results from the last local run.
+<div style="background:#1a2744;border:1px solid #C59A2C;border-radius:8px;padding:16px 20px;margin-bottom:20px;">
+    <strong style="color:#C59A2C;">🌐 Web Server Mode</strong>
+    <p style="color:#94a3b8;font-size:13px;margin:4px 0 0;">
+        This is the web deployment on PythonAnywhere. Pipeline operations run on the local machine
+        and changes are pushed here via git. Use this portal for <strong style="color:#e2e8f0;">user management</strong> only.
+    </p>
+    <p style="color:#94a3b8;font-size:12px;margin:8px 0 0;">
+        Pipeline status below reflects the last update pushed from local.
+    </p>
+</div>
+{% else %}
+<div style="background:#1a2744;border:1px solid #34d399;border-radius:8px;padding:16px 20px;margin-bottom:20px;">
+    <strong style="color:#34d399;">🖥️ Local Pipeline Mode</strong>
+    <p style="color:#94a3b8;font-size:13px;margin:4px 0 0;">
+        Full codebase detected. Run pipeline steps below — changes will be automatically
+        committed, pushed, and deployed to the live website.
     </p>
 </div>
 {% endif %}
@@ -56,10 +66,11 @@
     </div>
 </div>
 
+{% if has_full_codebase %}
 <!-- Run Daily Update -->
 <div class="pipeline-card">
     <h4>Run Daily Update</h4>
-    <p>Download latest market data and run the full portfolio update pipeline.</p>
+    <p>Download latest market data, run portfolio update, regenerate all reports, and deploy to live website.</p>
     <form method="POST" action="{{ url_for('admin.pipeline_run') }}" id="daily-form">
         <input type="hidden" name="mode" value="daily">
         <div style="margin-bottom:12px;">
@@ -102,12 +113,27 @@
     </form>
 </div>
 
+<!-- Pipeline Steps Info -->
+<div class="pipeline-card" style="background:#1a2744;border-color:#334155;">
+    <h4 style="color:#94a3b8;">Pipeline Steps</h4>
+    <ol style="color:#94a3b8;font-size:13px;line-height:2;padding-left:20px;margin:8px 0 0;">
+        <li>Download market data (stocks, ETFs, indices)</li>
+        <li>Run portfolio update (all equity curves)</li>
+        <li>Regenerate dashboard</li>
+        <li>Regenerate monthly report</li>
+        <li>Regenerate site metrics (hero stats)</li>
+        <li>Copy files to web directory</li>
+        <li>Git commit &amp; push to remote</li>
+        <li>Reload PythonAnywhere webapp</li>
+    </ol>
+</div>
+{% endif %}
+
 <script>
 (function() {
     let polling = {{ 'true' if pipeline_status.state == 'running' else 'false' }};
     let pollInterval = null;
 
-    // Disable all submit buttons if pipeline is running
     function setButtonsDisabled(disabled) {
         document.querySelectorAll('#daily-form button, #rerun-form button, #midday-form button').forEach(btn => {
             btn.disabled = disabled;
@@ -123,10 +149,8 @@
         const progressFill = document.getElementById('progress-fill');
         const logDiv = document.getElementById('pipeline-log');
 
-        // Update dot
         dot.className = 'status-dot ' + (data.state || 'idle');
 
-        // Update title
         if (data.state === 'running') {
             title.textContent = 'Running...';
             progressBar.style.display = '';
@@ -153,7 +177,6 @@
             stopPolling();
         }
 
-        // Update log
         if (data.log && data.log.length > 0) {
             logDiv.style.display = '';
             logDiv.innerHTML = data.log.map(function(line) {
@@ -189,14 +212,12 @@
         }
     }
 
-    // Start polling on form submit
     document.querySelectorAll('#daily-form, #rerun-form, #midday-form').forEach(form => {
         form.addEventListener('submit', function() {
             setTimeout(startPolling, 1000);
         });
     });
 
-    // Auto-start polling if already running
     if (polling) {
         pollInterval = setInterval(pollStatus, 2000);
         setButtonsDisabled(true);

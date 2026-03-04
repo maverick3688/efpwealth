@@ -2,6 +2,7 @@ efpwealth.db
 __pycache__/
 *.pyc
 .env
+pa_config.json
 *.egg-info/
 dist/
 build/
