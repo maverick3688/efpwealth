@@ -361,6 +361,14 @@
         },
         {
             "action": "BUY",
+            "symbol": "LIQUIDBEES",
+            "shares": 20.99,
+            "price": 1000.0,
+            "value": 20991.0,
+            "reason": "Debt rebalance"
+        },
+        {
+            "action": "BUY",
             "symbol": "INDUSTOWER",
             "shares": 40.06,
             "price": 443.9,
