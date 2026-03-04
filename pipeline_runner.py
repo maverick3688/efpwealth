@@ -446,7 +446,7 @@ def _run_step(step_key, mode='daily'):
             return True, f'Deployed to remote ({commit_msg})'
 
         elif step_key == 'reload_remote':
-            # Pull changes and reload webapp on PythonAnywhere via API
+            # Upload changed files and reload webapp on PythonAnywhere
             config_path = WEB_DIR / 'pa_config.json'
             if not config_path.exists():
                 return True, 'Skipped remote reload (no pa_config.json)'
@@ -461,78 +461,74 @@ def _run_step(step_key, mode='daily'):
 
             import urllib.request
             import urllib.error
-            import time
             headers = {'Authorization': f'Token {pa_token}'}
-            pull_ok = False
 
-            # 1. Git pull via console API
-            try:
-                # List existing consoles — reuse one if available
-                list_url = f'https://www.pythonanywhere.com/api/v0/user/{pa_user}/consoles/'
-                req = urllib.request.Request(list_url, headers=headers)
-                resp = urllib.request.urlopen(req, timeout=15)
-                consoles = json.loads(resp.read().decode('utf-8'))
+            # 1. Upload changed files directly via PA files API
+            #    (replaces unreliable console-based git pull)
+            files_to_upload = [
+                'static/dashboard.html',
+                'static/monthly_report.html',
+                'data/site_metrics.json',
+                'data/current_signals.json',
+                'data/pipeline_status.json',
+            ]
+            uploaded = 0
+            boundary = '----PipelineDeploy'
+            for filepath in files_to_upload:
+                local_path = WEB_DIR / filepath
+                if not local_path.exists():
+                    continue
+                try:
+                    file_content = local_path.read_bytes()
+                    filename = local_path.name
+                    body = (
+                        f'--{boundary}\r\n'
+                        f'Content-Disposition: form-data; name="content";'
+                        f' filename="{filename}"\r\n'
+                        f'Content-Type: application/octet-stream\r\n'
+                        f'\r\n'
+                    ).encode('utf-8') + file_content + (
+                        f'\r\n--{boundary}--\r\n'
+                    ).encode('utf-8')
 
-                console_id = None
-                created_console = False
-
-                # Prefer reusing an existing bash console
-                for c in consoles:
-                    if 'bash' in c.get('executable', '').lower():
-                        console_id = c['id']
-                        break
-
-                # No existing console — create one
-                if not console_id:
-                    create_data = json.dumps({
-                        'executable': 'bash',
-                        'arguments': '',
-                        'working_directory': f'/home/{pa_user}/efpwealth'
-                    }).encode('utf-8')
-                    req = urllib.request.Request(list_url, data=create_data, headers={
-                        **headers, 'Content-Type': 'application/json'
-                    }, method='POST')
-                    resp = urllib.request.urlopen(req, timeout=30)
-                    body = resp.read().decode('utf-8')
-                    if body.strip():
-                        info = json.loads(body)
-                        console_id = info.get('id')
-                        created_console = True
-
-                if console_id:
-                    send_url = f'https://www.pythonanywhere.com/api/v0/user/{pa_user}/consoles/{console_id}/send_input/'
-                    cmd = f'cd /home/{pa_user}/efpwealth && git pull origin master\n'
-                    send_data = json.dumps({'input': cmd}).encode('utf-8')
-                    req = urllib.request.Request(send_url, data=send_data, headers={
-                        **headers, 'Content-Type': 'application/json'
+                    pa_path = f'/home/{pa_user}/efpwealth/{filepath}'
+                    url = f'https://www.pythonanywhere.com/api/v0/user/{pa_user}/files/path{pa_path}'
+                    req = urllib.request.Request(url, data=body, headers={
+                        **headers,
+                        'Content-Type': f'multipart/form-data; boundary={boundary}',
                     }, method='POST')
                     urllib.request.urlopen(req, timeout=30)
-                    time.sleep(8)  # wait for pull to finish
-                    pull_ok = True
-
-                    # Clean up only if we created a new console
-                    if created_console:
-                        try:
-                            kill_url = f'https://www.pythonanywhere.com/api/v0/user/{pa_user}/consoles/{console_id}/'
-                            req = urllib.request.Request(kill_url, headers=headers, method='DELETE')
-                            urllib.request.urlopen(req, timeout=10)
-                        except Exception:
-                            pass
-            except Exception as e:
-                # Non-fatal: continue to reload (code was already pushed)
-                pull_ok = False
+                    uploaded += 1
+                except Exception as e:
+                    pass  # non-fatal per file, continue
 
             # 2. Reload webapp
             try:
                 reload_url = f'https://www.pythonanywhere.com/api/v0/user/{pa_user}/webapps/{pa_domain}/reload/'
                 req = urllib.request.Request(reload_url, data=b'', headers=headers, method='POST')
-                resp = urllib.request.urlopen(req, timeout=30)
-                pull_note = 'pulled + ' if pull_ok else 'pull skipped, '
-                return True, f'Remote {pull_note}reloaded ({pa_domain})'
+                urllib.request.urlopen(req, timeout=30)
             except urllib.error.HTTPError as e:
                 return False, f'Reload failed: HTTP {e.code} - {e.read().decode("utf-8", errors="replace")}'
             except Exception as e:
                 return False, f'Reload failed: {str(e)}'
+
+            # 3. Verify signals file was uploaded correctly
+            try:
+                verify_url = f'https://www.pythonanywhere.com/api/v0/user/{pa_user}/files/path/home/{pa_user}/efpwealth/data/current_signals.json'
+                req = urllib.request.Request(verify_url, headers=headers)
+                resp = urllib.request.urlopen(req, timeout=15)
+                remote_signals = json.loads(resp.read().decode('utf-8'))
+                local_signals = json.loads(
+                    (WEB_DIR / 'data' / 'current_signals.json')
+                    .read_text(encoding='utf-8')
+                )
+                verified = remote_signals.get('date') == local_signals.get('date') and \
+                           len(remote_signals.get('pending_trades', [])) == len(local_signals.get('pending_trades', []))
+                verify_note = ' (verified)' if verified else ' (NOT verified)'
+            except Exception:
+                verify_note = ''
+
+            return True, f'Uploaded {uploaded} files, reloaded{verify_note}'
 
     except Exception as e:
         return False, f'{str(e)}\n{traceback.format_exc()}'
