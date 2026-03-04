@@ -96,19 +96,19 @@
             "symbol": "EICHERMOT",
             "weight": 1.4,
             "sector": "",
-            "score": 0
+            "score": 0.46
         },
         {
             "symbol": "MARICO",
             "weight": 1.3,
             "sector": "",
-            "score": 0
+            "score": 0.47
         },
         {
             "symbol": "IDFCFIRSTB",
             "weight": 1.2,
             "sector": "",
-            "score": 0
+            "score": -0.05
         },
         {
             "symbol": "NAM-INDIA",
@@ -120,7 +120,7 @@
             "symbol": "COLPAL",
             "weight": 1.1,
             "sector": "",
-            "score": 0
+            "score": 1.51
         },
         {
             "symbol": "BANKINDIA",
@@ -138,7 +138,7 @@
             "symbol": "BSE",
             "weight": 0.8,
             "sector": "",
-            "score": 0
+            "score": 0.46
         },
         {
             "symbol": "INDIANB",
@@ -150,7 +150,7 @@
             "symbol": "MUTHOOTFIN",
             "weight": 0.5,
             "sector": "",
-            "score": 0
+            "score": 0.36
         },
         {
             "symbol": "AXISBANK",
@@ -168,37 +168,37 @@
             "symbol": "NMDC",
             "weight": 0.1,
             "sector": "",
-            "score": 0
+            "score": 0.44
         },
         {
             "symbol": "TCS",
             "weight": 0.1,
             "sector": "",
-            "score": 0
+            "score": 0.43
         },
         {
             "symbol": "MAHABANK",
             "weight": 0.1,
             "sector": "",
-            "score": 0
+            "score": 0.6
         },
         {
             "symbol": "HEROMOTOCO",
             "weight": 0.1,
             "sector": "",
-            "score": 0
+            "score": 0.35
         },
         {
             "symbol": "HDFCAMC",
             "weight": 0.0,
             "sector": "",
-            "score": 0
+            "score": 0.48
         },
         {
             "symbol": "3MINDIA",
             "weight": 0.0,
             "sector": "",
-            "score": 0
+            "score": 0.27
         }
     ],
     "changes": {}
