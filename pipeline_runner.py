@@ -16,14 +16,14 @@ from datetime import datetime, timezone
 # These paths work whether running locally (Windows) or on PythonAnywhere
 WEB_DIR = Path(__file__).parent
 GREYSKY_DIR = WEB_DIR.parent  # C:/TradingData/greysky (local) or /home/efpwealth (PA)
-CHECKPOINT_DIR = GREYSKY_DIR / 'checkpoint_v8'
+CHECKPOINT_DIR = GREYSKY_DIR / 'checkpoint_v9'
 DATA_DIR = GREYSKY_DIR / 'data'
 STATUS_FILE = WEB_DIR / 'data' / 'pipeline_status.json'
 
-# Detect if running on PythonAnywhere (no checkpoint_v8 directory)
+# Detect if running on PythonAnywhere (no checkpoint_v9 directory)
 HAS_FULL_CODEBASE = CHECKPOINT_DIR.exists() and DATA_DIR.exists()
 
-# Ensure checkpoint_v8 is importable (only if available)
+# Ensure checkpoint_v9 is importable (only if available)
 if HAS_FULL_CODEBASE:
     if str(CHECKPOINT_DIR) not in sys.path:
         sys.path.insert(0, str(CHECKPOINT_DIR))
@@ -578,7 +578,7 @@ def run_pipeline(mode='daily', from_date=None, skip_download=False):
     if not HAS_FULL_CODEBASE:
         missing = []
         if not CHECKPOINT_DIR.exists():
-            missing.append(f'checkpoint_v8 ({CHECKPOINT_DIR})')
+            missing.append(f'checkpoint_v9 ({CHECKPOINT_DIR})')
         if not DATA_DIR.exists():
             missing.append(f'data ({DATA_DIR})')
         error_msg = (
