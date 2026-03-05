@@ -89,12 +89,7 @@
       </div>
     </div>
     <div class="footer-disclaimer">
-      All returns shown are based on walk-forward backtested results using historical data
-      and are hypothetical. Past performance does not guarantee future results and is not
-      indicative of future returns. Investments in securities are subject to market risks.
-      Read all related documents carefully before investing. 10 bps round-trip slippage applied.
-      Does not include management fees, taxes, or impact costs beyond slippage. Strategy results
-      assume full investment at model signals; actual investor returns may differ.
+      {{ content.get('disclaimers', {}).get('footer_text', 'All returns shown are based on walk-forward backtested results using historical data and are HYPOTHETICAL. Past performance does not guarantee future results. Investments in securities are subject to market risks. Read all related documents carefully before investing.') }}
     </div>
     <div class="footer-bottom">
       &copy; {{ now_year }} EFP Wealth. All rights reserved.

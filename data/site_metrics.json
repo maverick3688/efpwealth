@@ -3556,5 +3556,12 @@
       -0.079
     ]
   },
-  "generated_at": "2026-03-05 10:41"
+  "data_freshness": {
+    "last_constituent_snapshot": "2026-03-31",
+    "staleness_days": -25,
+    "stale": false,
+    "total_snapshots": 96,
+    "unique_symbols": 464
+  },
+  "generated_at": "2026-03-06 03:54"
 }

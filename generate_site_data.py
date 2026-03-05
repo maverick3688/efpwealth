@@ -148,6 +148,28 @@ def generate():
         allocation = {}
         print("Warning: wf_allocations.csv not found, skipping allocation data")
 
+    # --- Data freshness (constituent staleness check) ---
+    constituent_path = DATA_DIR / 'constituent_history_v2.csv'
+    if constituent_path.exists():
+        ch = pd.read_csv(constituent_path)
+        ch['date'] = pd.to_datetime(ch['date'])
+        last_snapshot = ch['date'].max()
+        n_snapshots = ch['date'].nunique()
+        n_unique_symbols = ch['symbol'].nunique()
+        staleness_days = (pd.Timestamp.now() - last_snapshot).days
+        data_freshness = {
+            'last_constituent_snapshot': last_snapshot.strftime('%Y-%m-%d'),
+            'staleness_days': int(staleness_days),
+            'stale': staleness_days > 90,
+            'total_snapshots': int(n_snapshots),
+            'unique_symbols': int(n_unique_symbols),
+        }
+        stale_flag = ' (STALE!)' if staleness_days > 90 else ''
+        print(f"Data freshness: last snapshot {last_snapshot.strftime('%Y-%m-%d')} ({staleness_days}d ago{stale_flag})")
+    else:
+        data_freshness = {'stale': True, 'staleness_days': -1}
+        print("Warning: constituent_history_v2.csv not found")
+
     # --- Assemble output ---
     site_data = {
         'hero': hero,
@@ -157,6 +179,7 @@ def generate():
         'monthly_returns': monthly_returns,
         'drawdown': drawdown,
         'allocation': allocation,
+        'data_freshness': data_freshness,
         'generated_at': datetime.now().strftime('%Y-%m-%d %H:%M'),
     }
 

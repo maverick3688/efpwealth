@@ -160,6 +160,34 @@ def _update_parquet(parquet_path, today, ohlcv):
     return True
 
 
+def _update_constituents():
+    """
+    Fetch latest NIFTY 250 constituent list and update history if changed.
+    Non-blocking: returns (True, message) even on failure so pipeline continues.
+    """
+    import subprocess
+    script = GREYSKY_DIR / 'update_constituents.py'
+    if not script.exists():
+        return True, 'update_constituents.py not found (skipped)'
+    try:
+        result = subprocess.run(
+            [sys.executable, str(script)],
+            cwd=str(GREYSKY_DIR), capture_output=True, text=True,
+            timeout=120, encoding='utf-8', errors='replace'
+        )
+        # Extract last meaningful line as message
+        output_lines = [l.strip() for l in result.stdout.strip().split('\n') if l.strip()]
+        msg = output_lines[-1] if output_lines else 'Constituent update completed'
+        if result.returncode != 0:
+            # Non-fatal: warn but don't fail pipeline
+            return True, f'Constituent update warning: {msg}'
+        return True, msg
+    except subprocess.TimeoutExpired:
+        return True, 'Constituent update timed out (skipped)'
+    except Exception as e:
+        return True, f'Constituent update error: {str(e)} (skipped)'
+
+
 def _download_midday_data():
     """
     Fetch near-real-time prices for ALL constituent stocks + ETFs.
@@ -294,7 +322,10 @@ def _run_step(step_key, mode='daily'):
     original_cwd = os.getcwd()
 
     try:
-        if step_key == 'download':
+        if step_key == 'constituents':
+            return _update_constituents()
+
+        elif step_key == 'download':
             if mode == 'midday':
                 n = _download_midday_data()
                 return True, f'Updated {n} stock prices (mid-day)'
@@ -541,6 +572,7 @@ def _run_step(step_key, mode='daily'):
 # =============================================================================
 
 PIPELINE_STEPS = [
+    ('constituents', 'Updating constituent list'),
     ('download', 'Downloading market data'),
     ('portfolio', 'Running portfolio update'),
     ('dashboard', 'Regenerating dashboard'),
@@ -553,6 +585,7 @@ PIPELINE_STEPS = [
 
 # Mid-day mode: lighter pipeline — only fetch prices, regenerate signals, deploy
 MIDDAY_STEPS = [
+    ('constituents', 'Checking constituent list'),
     ('download', 'Fetching latest prices'),
     ('signals', 'Regenerating signals with live prices'),
     ('copy', 'Copying files to web'),

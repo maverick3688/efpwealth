@@ -141,17 +141,19 @@
     "min_investment": "\u20b950 Lakhs"
   },
   "disclaimers": {
-    "banner_text": "All returns shown are walk-forward backtested results using historical data and are hypothetical. Past performance does not guarantee future results. Investments are subject to market risks. This is not investment advice.",
-    "sticky_text": "Past performance is hypothetical and does not guarantee future results. Not investment advice.",
-    "footer_text": "All returns shown are based on walk-forward backtested results using historical data and are hypothetical. Past performance does not guarantee future results and is not indicative of future returns. Investments in securities are subject to market risks. Read all related documents carefully before investing. 10 bps round-trip slippage applied. Does not include management fees, taxes, or impact costs beyond slippage. Strategy results assume full investment at model signals; actual investor returns may differ."
+    "banner_text": "All returns shown are BACKTESTED, HYPOTHETICAL results using historical data. They do NOT represent actual trading. Past performance does not guarantee future results. Investments are subject to market risks. This is not investment advice.",
+    "sticky_text": "Backtested, hypothetical results. Past performance does not guarantee future results. Not investment advice.",
+    "footer_text": "IMPORTANT DISCLOSURES: All returns shown are based on walk-forward backtested results using historical data and are HYPOTHETICAL. They do not represent actual trading and were derived with the benefit of hindsight. Past performance does not guarantee future results and is not indicative of future returns. Backtested performance has inherent limitations: (1) it is designed with the benefit of hindsight, (2) it does not reflect the impact of economic and market factors differently than during the backtested period, (3) it cannot fully account for the impact of financial risk in actual trading, (4) actual results may differ due to market conditions, liquidity, and execution differences. Walk-forward validation mitigates overfitting but does not eliminate it. 10 bps round-trip slippage applied. Does not include management fees, taxes, stamp duty, STT, or impact costs beyond slippage. Strategy results assume full investment at model signals; actual investor returns may differ. Investments in securities are subject to market risks. Read all related documents carefully before investing.",
+    "methodology_disclosure": "Walk-forward backtested performance using 17 non-overlapping 6-month out-of-sample windows from 2016-2026. Factor weights optimised on 2-year training windows. Survivorship-bias-corrected using 96 point-in-time NSE constituent snapshots covering 464 unique stocks. Constituent data may have gaps of up to 6 months in recent periods.",
+    "bias_disclosures": "Potential biases: (1) Survivorship bias \u2014 mitigated via point-in-time constituent data (96 snapshots); 46 of 464 historical constituents have incomplete data (6.1% of constituent-months). (2) Look-ahead bias \u2014 mitigated via walk-forward validation (no future data in training). (3) Data-snooping bias \u2014 8 weight presets tested per window; risk of overfitting partially addressed by out-of-sample validation. (4) Transaction cost bias \u2014 10 bps round-trip slippage applied; actual costs may differ. (5) Selection bias \u2014 NIFTY LargeMidcap 250 universe selected ex-ante, not cherry-picked."
   },
   "navigation": {
     "brand_name": "EFP",
     "brand_sub": "Wealth"
   },
   "meta": {
-    "content_version": "2.0",
-    "last_edited": "2026-03-03",
+    "content_version": "2.1",
+    "last_edited": "2026-03-05",
     "notes": "Edit this file to update website text. Restart Flask (or reload on PythonAnywhere) to apply changes."
   }
 }
