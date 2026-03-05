@@ -1,10 +1,11 @@
 {
-  "state": "running",
+  "state": "completed",
   "mode": "daily",
-  "step": 7,
+  "step": 8,
   "total": 8,
-  "current_step": "Git commit & push",
+  "current_step": "All steps completed",
   "started_at": "2026-03-04 12:59:14",
+  "completed_at": "2026-03-04 13:00:03",
   "log": [
     "[OK] Checkpoints backed up",
     "[OK] Downloading market data: Downloaded market data",
@@ -12,7 +13,9 @@
     "[OK] Regenerating dashboard: Dashboard regenerated",
     "[FAIL] Regenerating monthly report: Monthly report failed: d\n    result = super()._cmp_method(other, op)\n  File \"C:\\Users\\USER\\AppData\\Roaming\\Python\\Python314\\site-packages\\pandas\\core\\arrays\\arrow\\array.py\", line 949, in _cmp_method\n    result = ops.invalid_comparison(self, other, op)\n  File \"C:\\Users\\USER\\AppData\\Roaming\\Python\\Python314\\site-packages\\pandas\\core\\ops\\invalid.py\", line 55, in invalid_comparison\n    raise TypeError(f\"Invalid comparison between dtype={left.dtype} and {typ}\")\nTypeError: Invalid comparison between dtype=str and Timestamp\n",
     "[OK] Regenerating site metrics: Site metrics regenerated",
-    "[OK] Copying files to web: Copied 3 files to web/"
+    "[OK] Copying files to web: Copied 3 files to web/",
+    "[OK] Git commit & push: Deployed to remote (Daily update 2026-03-04 (daily))",
+    "[OK] Reloading remote webapp: Remote reloaded (efpwealth.pythonanywhere.com)"
   ],
-  "updated_at": "2026-03-04 12:59:53"
+  "updated_at": "2026-03-04 13:00:03"
 }
