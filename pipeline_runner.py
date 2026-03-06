@@ -140,11 +140,23 @@ def _update_parquet(parquet_path, today, ohlcv):
     """Update a single parquet file with today's price data.
     ohlcv = dict with keys: Open, High, Low, Close, Volume
     Returns True if updated successfully.
+    Warns on >20% price discontinuity (possible split/bonus).
     """
     import pandas as pd
     if not parquet_path.exists():
         return False
     df = pd.read_parquet(parquet_path)
+
+    # Price discontinuity check (split/bonus detection)
+    if today not in df.index and len(df) > 0:
+        last_close = df['Close'].iloc[-1]
+        new_close = ohlcv['Close']
+        if last_close > 0 and new_close > 0 and abs(new_close / last_close - 1) > 0.20:
+            sym = parquet_path.stem
+            print(f"  WARNING: {sym} price discontinuity: "
+                  f"{last_close:.2f} -> {new_close:.2f} "
+                  f"({(new_close/last_close - 1)*100:+.1f}%) -- possible split/bonus")
+
     if today not in df.index:
         new_row = pd.DataFrame({
             'Open': [ohlcv['Open']], 'High': [ohlcv['High']],
@@ -257,6 +269,7 @@ def _download_midday_data():
                     data = yf.download(
                         batch_tickers, period='1d',
                         group_by='ticker', threads=True,
+                        auto_adjust=True,
                         progress=False
                     )
 
