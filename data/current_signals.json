@@ -201,14 +201,7 @@
             "score": 0.44
         }
     ],
-    "changes": {
-        "buy": [
-            "POWERGRID"
-        ],
-        "sell": [
-            "3MINDIA"
-        ]
-    },
+    "changes": {},
     "pending_trades": [
         {
             "action": "SELL",
