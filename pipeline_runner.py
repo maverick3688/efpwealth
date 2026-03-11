@@ -269,7 +269,7 @@ def _download_midday_data():
                     data = yf.download(
                         batch_tickers, period='1d',
                         group_by='ticker', threads=True,
-                        auto_adjust=True,
+                        auto_adjust=False,
                         progress=False
                     )
 
