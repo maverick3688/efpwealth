@@ -1,7 +1,7 @@
 {
   "landing": {
     "hero_headline": "Systematic Alpha for <span class=\"text-gold\">Serious Capital</span>",
-    "hero_subtitle": "A 13-factor, regime-aware strategy with walk-forward validation across {years} years. Designed for patient, long-term capital seeking systematic alpha with institutional-grade risk management.",
+    "hero_subtitle": "An 8-factor, regime-aware strategy with walk-forward validation across {years} years. Designed for patient, long-term capital seeking systematic alpha with institutional-grade risk management.",
     "metric_labels": {
       "cagr": "CAGR",
       "sharpe": "Sharpe Ratio",
@@ -15,11 +15,11 @@
     "process_steps": [
       {
         "title": "Factor-Based Stock Selection",
-        "description": "13 quantitative factors spanning momentum, value, quality, and low volatility. Cross-sectional ranking of NIFTY LargeMidcap 250 constituents. Top 20 positions with 15% max single-stock weight, rebalanced daily across 21 staggered tranches."
+        "description": "8 quantitative factors spanning momentum, value, quality, and low volatility. Cross-sectional ranking of NIFTY LargeMidcap 250 constituents. Top 20 positions with 15% max single-stock weight, rebalanced daily across 21 staggered tranches."
       },
       {
         "title": "Regime-Aware Allocation",
-        "description": "Multi-signal ensemble detects market regimes on a continuous scale. Dynamically allocates between equities, gold, and debt based on conviction."
+        "description": "Multi-signal ensemble detects market regimes on a continuous scale. Dynamically allocates between equities and gold based on conviction."
       },
       {
         "title": "Walk-Forward Validation",
@@ -32,7 +32,7 @@
           "label": "Stock Selection",
           "typical_pms": "Discretionary / conviction-based",
           "index_funds": "Market-cap weighted, no selection",
-          "efp": "13-factor quantitative model"
+          "efp": "8-factor quantitative model"
         },
         {
           "label": "Validation",
@@ -68,8 +68,8 @@
     "page_title": "Our Approach",
     "page_subtitle": "A systematic, rules-based investment process combining factor-based stock selection, regime-aware allocation, and rigorous out-of-sample validation.",
     "philosophy_paragraphs": [
-      "We believe that markets reward certain persistent risk premia \u2014 momentum, value, quality, and low volatility \u2014 that can be harvested systematically. Rather than relying on human judgement or conviction-based stock picking, we use a quantitative model that ranks stocks on 13 measurable factors and constructs portfolios purely based on data.",
-      "Equally important is knowing <strong>when</strong> to invest. Our regime detection ensemble continuously monitors market conditions and adjusts the portfolio's allocation between equities, gold, and debt. This reduces drawdowns without sacrificing long-term returns.",
+      "We believe that markets reward certain persistent risk premia \u2014 momentum, value, quality, and low volatility \u2014 that can be harvested systematically. Rather than relying on human judgement or conviction-based stock picking, we use a quantitative model that ranks stocks on 8 measurable factors and constructs portfolios purely based on data.",
+      "Equally important is knowing <strong>when</strong> to invest. Our regime detection ensemble continuously monitors market conditions and adjusts the portfolio's allocation between equities and gold. This reduces drawdowns without sacrificing long-term returns.",
       "Every aspect of our methodology is walk-forward validated \u2014 we never use future data to make past decisions. This discipline ensures that our track record reflects what an investor would have actually experienced, not an optimised backtest."
     ],
     "factor_section_title": "Multi-Factor Stock Selection",
@@ -97,9 +97,9 @@
       }
     ],
     "regime_title": "Regime-Aware Allocation",
-    "regime_subtitle": "A multi-signal ensemble detects market regimes on a continuous scale. The allocation between equities, gold, and debt shifts dynamically based on regime conviction.",
+    "regime_subtitle": "A multi-signal ensemble detects market regimes on a continuous scale. The allocation between equities and gold shifts dynamically based on regime conviction.",
     "allocation_chart_title": "Historical Asset Allocation",
-    "allocation_chart_subtitle": "Dynamic allocation across equities, gold, and debt based on regime confidence score. Each bar represents a rebalance cycle (21 daily staggered tranches per cycle).",
+    "allocation_chart_subtitle": "Dynamic allocation across equities and gold based on regime confidence score. Each bar represents a rebalance cycle (21 daily staggered tranches per cycle).",
     "wf_section_title": "Walk-Forward Validation",
     "wf_section_subtitle": "The strongest test of any investment strategy is whether it works on data it has never seen. We use walk-forward validation \u2014 the gold standard in systematic trading research.",
     "wf_description": "<strong>How it works:</strong> In each window, the model optimises factor weights on the training data (2 years), then applies those weights to the subsequent test period (6 months) that it has never seen. Within each test window, the portfolio is rebalanced daily via 21 staggered tranches with a 15% maximum single-stock weight cap, reducing timing risk and market impact. The portfolio track record is built entirely from these test periods \u2014 none of the reported returns come from in-sample data.",
