@@ -6,31 +6,18 @@
     <p style="color:#64748b;font-size:14px;margin-bottom:32px;">Monthly rebalance recommendations for {{ user.name }}.</p>
 
     {% if signals %}
-    <!-- Regime & Allocation -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
-        <div style="background:#1B2A4A;border-radius:12px;padding:24px;text-align:center;">
-            <div style="color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">Regime Confidence</div>
-            <div style="font-size:36px;font-weight:700;color:{% if signals.regime_confidence > 0.3 %}#34d399{% elif signals.regime_confidence > -0.3 %}#fbbf24{% else %}#f87171{% endif %}">
-                {{ "%.2f"|format(signals.regime_confidence) }}
-            </div>
-            <div style="color:#94a3b8;font-size:12px;margin-top:4px;">
-                {% if signals.regime_confidence > 0.3 %}Bullish{% elif signals.regime_confidence > -0.3 %}Neutral{% else %}Bearish{% endif %}
-            </div>
-        </div>
+    <!-- Asset Allocation -->
+    <div style="display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:24px;">
         <div style="background:#1B2A4A;border-radius:12px;padding:24px;">
-            <div style="color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Asset Allocation</div>
-            <div style="display:flex;gap:16px;justify-content:center;">
+            <div style="color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Asset Allocation (Fixed 60/40)</div>
+            <div style="display:flex;gap:32px;justify-content:center;">
                 <div style="text-align:center;">
-                    <div style="font-size:24px;font-weight:700;color:#60a5fa;">{{ signals.allocation.equity }}%</div>
-                    <div style="color:#94a3b8;font-size:11px;">Equity</div>
+                    <div style="font-size:36px;font-weight:700;color:#60a5fa;">60%</div>
+                    <div style="color:#94a3b8;font-size:12px;">Equity</div>
                 </div>
                 <div style="text-align:center;">
-                    <div style="font-size:24px;font-weight:700;color:#fbbf24;">{{ signals.allocation.gold }}%</div>
-                    <div style="color:#94a3b8;font-size:11px;">Gold</div>
-                </div>
-                <div style="text-align:center;">
-                    <div style="font-size:24px;font-weight:700;color:#34d399;">{{ signals.allocation.debt }}%</div>
-                    <div style="color:#94a3b8;font-size:11px;">Debt</div>
+                    <div style="font-size:36px;font-weight:700;color:#fbbf24;">40%</div>
+                    <div style="color:#94a3b8;font-size:12px;">Gold</div>
                 </div>
             </div>
         </div>

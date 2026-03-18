@@ -1,7 +1,7 @@
 {% extends "base_public.html" %}
 
 {% block title %}Our Approach — EFP Wealth{% endblock %}
-{% block description %}Multi-factor quantitative model with regime-aware allocation and walk-forward validation. A systematic, rules-based investment process.{% endblock %}
+{% block description %}Multi-factor quantitative model with strategic 60/40 equity/gold allocation and walk-forward validation. A systematic, rules-based investment process.{% endblock %}
 
 {% block head %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -17,7 +17,7 @@
 <div class="page-header">
   <div class="container">
     <h1>{{ c.get('page_title', 'Our Approach') }}</h1>
-    <p>{{ c.get('page_subtitle', 'A systematic, rules-based investment process combining factor-based stock selection, regime-aware allocation, and rigorous out-of-sample validation.') }}</p>
+    <p>{{ c.get('page_subtitle', 'A systematic, rules-based investment process combining factor-based stock selection, strategic asset allocation, and rigorous out-of-sample validation.') }}</p>
   </div>
 </div>
 
@@ -34,7 +34,7 @@
     <!-- Multi-Factor Model — Icon Cards -->
     <h2 class="section-title" style="margin-bottom: 8px;">{{ c.get('factor_section_title', 'Multi-Factor Stock Selection') }}</h2>
     <p class="section-subtitle" style="margin-bottom: 32px;">
-      {{ c.get('factor_section_subtitle', 'Stocks from the NIFTY LargeMidcap 250 universe are ranked across four factor categories. Top 20 stocks by composite score are selected, conviction-weighted, and rebalanced monthly.') }}
+      {{ c.get('factor_section_subtitle', 'Stocks from the NIFTY LargeMidcap 250 universe are ranked across four factor categories. Top 25 stocks by composite score are selected with a 10% max single-stock weight cap, rebalanced daily across 21 staggered tranches.') }}
     </p>
 
     <div class="factor-icon-grid">
@@ -71,28 +71,43 @@
         <h4>Value</h4>
         <p>{{ c.get('factor_categories', [{}]*3)[2].get('description', 'Earnings-based valuation attractiveness') if c.get('factor_categories') and c.get('factor_categories')|length > 2 else 'Earnings-based valuation attractiveness' }}</p>
       </div>
-      <!-- Low Volatility -->
+      <!-- Trend -->
       <div class="factor-icon-card">
         <div class="factor-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="#C59A2C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <polyline points="1 12 5 12 9 4 15 20 19 12 23 12"></polyline>
           </svg>
         </div>
-        <h4>Low Volatility</h4>
-        <p>{{ c.get('factor_categories', [{}]*4)[3].get('description', 'Risk-reduction tilt toward stable names') if c.get('factor_categories') and c.get('factor_categories')|length > 3 else 'Risk-reduction tilt toward stable names' }}</p>
+        <h4>Trend</h4>
+        <p>{{ c.get('factor_categories', [{}]*4)[3].get('description', 'Price trend strength, proximity to highs, and volatility contraction') if c.get('factor_categories') and c.get('factor_categories')|length > 3 else 'Price trend strength, proximity to highs, and volatility contraction' }}</p>
       </div>
     </div>
 
-    <!-- Regime-Aware Allocation -->
-    <h2 class="section-title" style="margin-bottom: 8px; margin-top: 64px;">{{ c.get('regime_title', 'Regime-Aware Allocation') }}</h2>
+    <!-- Quality Pre-Screening -->
+    <h2 class="section-title" style="margin-bottom: 8px; margin-top: 64px;">{{ c.get('quality_filter_title', 'Quality Pre-Screening') }}</h2>
     <p class="section-subtitle" style="margin-bottom: 32px;">
-      {{ c.get('regime_subtitle', 'A multi-signal ensemble detects market regimes on a continuous scale. The allocation between equities, gold, and debt shifts dynamically based on regime conviction.') }}
+      {{ c.get('quality_filter_subtitle', 'Before factor scoring, hard filters remove fundamentally weak stocks from the investable universe.') }}
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 64px;">
+      {% for criterion in c.get('quality_criteria', []) %}
+      <div style="background: var(--gray-50); border-radius: var(--radius); padding: 20px;">
+        <h4 style="font-size: 14px; margin-bottom: 6px; color: var(--navy);">{{ criterion.name }}</h4>
+        <p style="font-size: 13px; color: var(--gray-500); line-height: 1.6; margin: 0;">{{ criterion.description }}</p>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Strategic Asset Allocation -->
+    <h2 class="section-title" style="margin-bottom: 8px;">{{ c.get('regime_title', 'Strategic Asset Allocation') }}</h2>
+    <p class="section-subtitle" style="margin-bottom: 32px;">
+      {{ c.get('regime_subtitle', 'A fixed 60% equity / 40% gold allocation provides consistent diversification. Gold reduces portfolio volatility and drawdowns while equities drive long-term growth.') }}
     </p>
 
     <div class="chart-container" style="margin-bottom: 64px;">
       <div class="chart-title">{{ c.get('allocation_chart_title', 'Historical Asset Allocation') }}</div>
       <div class="chart-subtitle">
-        {{ c.get('allocation_chart_subtitle', 'Dynamic allocation across equities, gold, and debt based on regime confidence score. Each bar represents a monthly rebalance point.') }}
+        {{ c.get('allocation_chart_subtitle', 'Fixed 60/40 equity/gold allocation across all rebalance cycles. Each bar represents a rebalance point (21 daily staggered tranches per cycle).') }}
       </div>
       <div class="chart-canvas-wrap" style="height: 320px;">
         <canvas id="allocationChart"></canvas>
@@ -106,19 +121,19 @@
     </p>
 
     <div class="wf-diagram">
-      <h4 style="margin-bottom: 16px;">17 Non-Overlapping Train/Test Windows</h4>
+      <h4 style="margin-bottom: 16px;">21 Non-Overlapping Train/Test Windows</h4>
       {% for i in range(6) %}
       <div class="wf-bar-row">
         <div class="wf-bar-label">W{{ i + 1 }}</div>
         <div class="wf-bar-train" style="width: {{ 40 - i * 2 }}%;"></div>
         <div class="wf-bar-test" style="width: {{ 12 }}%;"></div>
         <span style="font-size: 11px; color: var(--gray-400); margin-left: 8px;">
-          {% if i == 0 %}2015-2017 train &rarr; 2017 H1 test
-          {% elif i == 1 %}2015-2017.5 train &rarr; 2017 H2 test
-          {% elif i == 2 %}2016-2018 train &rarr; 2018 H1 test
-          {% elif i == 3 %}2016-2018.5 train &rarr; 2018 H2 test
-          {% elif i == 4 %}2017-2019 train &rarr; 2019 H1 test
-          {% elif i == 5 %}... through Window 17 &rarr; 2025 H2 test
+          {% if i == 0 %}2013-2015 train &rarr; 2015 H1 test
+          {% elif i == 1 %}2013-2015.5 train &rarr; 2015 H2 test
+          {% elif i == 2 %}2014-2016 train &rarr; 2016 H1 test
+          {% elif i == 3 %}2014-2016.5 train &rarr; 2016 H2 test
+          {% elif i == 4 %}2015-2017 train &rarr; 2017 H1 test
+          {% elif i == 5 %}... through Window 21 &rarr; 2026 H1 test
           {% endif %}
         </span>
       </div>

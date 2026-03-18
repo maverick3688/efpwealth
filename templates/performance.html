@@ -1,7 +1,7 @@
 {% extends "base_public.html" %}
 
 {% block title %}Performance — EFP Wealth{% endblock %}
-{% block description %}Walk-forward validated track record. 30.9% CAGR, 1.98 Sharpe, -16.1% max drawdown over 9 years.{% endblock %}
+{% block description %}Walk-forward validated track record. {{ metrics.get('hero', {}).get('cagr', '23.6') }}% CAGR, {{ metrics.get('hero', {}).get('sharpe', '1.40') }} Sharpe over {{ metrics.get('hero', {}).get('years', '11') }} years.{% endblock %}
 
 {% block head %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -12,49 +12,163 @@
 
 {% set h = metrics.get('hero', {}) %}
 {% set bm = metrics.get('benchmark', {}) %}
+{% set bm250 = metrics.get('benchmark_n250', {}) %}
 {% set ar = metrics.get('annual_returns', {}) %}
 
-<!-- Page Header -->
-<div class="page-header">
+<!-- Dark Hero Header with Key Metrics -->
+<div class="perf-hero">
   <div class="container">
     <h1>Track Record</h1>
-    <p>Walk-forward out-of-sample results from {{ h.get('period_start', 'Feb 2017') }} to {{ h.get('period_end', 'Feb 2026') }}. All returns include 10 bps round-trip slippage.</p>
+    <p class="perf-hero-sub">Walk-forward out-of-sample results from {{ h.get('period_start', 'Feb 2015') }} to {{ h.get('period_end', 'Mar 2026') }}.<br>All returns include 10 bps round-trip slippage. {{ h.get('years', '11.0') }} years &middot; {{ '{:,}'.format(h.get('trades', 154355)) }} trades &middot; {{ h.get('windows', '21') }} walk-forward windows.</p>
+
+    <div class="perf-hero-metrics">
+      <div class="perf-hero-box">
+        <span class="perf-hero-value text-gold">{{ h.get('cagr', '23.6') }}%</span>
+        <span class="perf-hero-label">CAGR</span>
+      </div>
+      <div class="perf-hero-box">
+        <span class="perf-hero-value">{{ h.get('sharpe', '1.40') }}</span>
+        <span class="perf-hero-label">Sharpe Ratio</span>
+      </div>
+      <div class="perf-hero-box">
+        <span class="perf-hero-value">{{ h.get('max_dd', '-24.9') }}%</span>
+        <span class="perf-hero-label">Max Drawdown</span>
+      </div>
+      <div class="perf-hero-box">
+        <span class="perf-hero-value text-gold">+{{ h.get('alpha', '14.3') }}%</span>
+        <span class="perf-hero-label">Alpha vs NIFTY 50</span>
+      </div>
+    </div>
   </div>
 </div>
 
 <section class="section">
   <div class="container">
 
-    <!-- Summary Cards -->
-    <div class="summary-grid">
-      <div class="summary-card">
-        <div class="label">EFP Wealth — Walk-Forward</div>
-        <table>
-          <tr><td>CAGR</td><td class="mono text-green">{{ h.get('cagr', '30.9') }}%</td></tr>
-          <tr><td>Sharpe Ratio</td><td class="mono">{{ h.get('sharpe', '1.98') }}</td></tr>
-          <tr><td>Max Drawdown</td><td class="mono text-red">{{ h.get('max_dd', '-16.1') }}%</td></tr>
-          <tr><td>Calmar Ratio</td><td class="mono">{{ h.get('calmar', '1.92') }}</td></tr>
-          <tr><td>Alpha vs NIFTY</td><td class="mono text-green">+{{ h.get('alpha', '18.5') }}%</td></tr>
-          <tr><td>Beta</td><td class="mono">{{ h.get('beta', '0.54') }}</td></tr>
-          <tr><td>Return Multiple</td><td class="mono">{{ h.get('multiple', '11.2') }}x</td></tr>
-          <tr><td>Monthly Win Rate</td><td class="mono">{{ h.get('win_rate', '69') }}%</td></tr>
-        </table>
+    <!-- 3-Column Comparison -->
+    <div class="perf-comparison">
+      <!-- EFP Wealth Column -->
+      <div class="perf-col perf-col-highlight">
+        <div class="perf-col-header">
+          <span class="perf-col-badge">Strategy</span>
+          <h3>EFP Wealth</h3>
+          <span class="perf-col-desc">Walk-Forward 60/40</span>
+        </div>
+        <div class="perf-col-body">
+          <div class="perf-metric-row">
+            <span>CAGR</span>
+            <span class="mono text-green">{{ h.get('cagr', '23.6') }}%</span>
+          </div>
+          <div class="perf-metric-row">
+            <span>Sharpe Ratio</span>
+            <span class="mono">{{ h.get('sharpe', '1.40') }}</span>
+          </div>
+          <div class="perf-metric-row">
+            <span>Max Drawdown</span>
+            <span class="mono">{{ h.get('max_dd', '-24.9') }}%</span>
+          </div>
+          <div class="perf-metric-row">
+            <span>Calmar Ratio</span>
+            <span class="mono">{{ h.get('calmar', '0.95') }}</span>
+          </div>
+          <div class="perf-metric-row">
+            <span>Return Multiple</span>
+            <span class="mono">{{ h.get('multiple', '10.4') }}x</span>
+          </div>
+          <div class="perf-metric-row">
+            <span>Monthly Win Rate</span>
+            <span class="mono">{{ h.get('win_rate', '66') }}%</span>
+          </div>
+          <div class="perf-metric-row">
+            <span>Beta</span>
+            <span class="mono">{{ h.get('beta', '0.63') }}</span>
+          </div>
+        </div>
       </div>
-      <div class="summary-card">
-        <div class="label">NIFTY 50 — Buy &amp; Hold</div>
-        <table>
-          <tr><td>CAGR</td><td class="mono">{{ bm.get('cagr', '12.4') }}%</td></tr>
-          <tr><td>Sharpe Ratio</td><td class="mono">{{ bm.get('sharpe', '0.81') }}</td></tr>
-          <tr><td>Max Drawdown</td><td class="mono text-red">{{ bm.get('max_dd', '-38.4') }}%</td></tr>
-          <tr><td>Return Multiple</td><td class="mono">{{ bm.get('multiple', '2.9') }}x</td></tr>
-        </table>
+
+      <!-- NIFTY LargeMidcap 250 Column -->
+      <div class="perf-col">
+        <div class="perf-col-header">
+          <span class="perf-col-badge perf-col-badge-muted">Universe</span>
+          <h3>NIFTY LargeMidcap 250</h3>
+          <span class="perf-col-desc">Buy &amp; Hold</span>
+        </div>
+        <div class="perf-col-body">
+          <div class="perf-metric-row">
+            <span>CAGR</span>
+            <span class="mono">{{ bm250.get('cagr', '12.3') }}%</span>
+          </div>
+          <div class="perf-metric-row">
+            <span>Sharpe Ratio</span>
+            <span class="mono">{{ bm250.get('sharpe', '0.81') }}</span>
+          </div>
+          <div class="perf-metric-row">
+            <span>Max Drawdown</span>
+            <span class="mono text-red">{{ bm250.get('max_dd', '-38.6') }}%</span>
+          </div>
+          <div class="perf-metric-row">
+            <span>Calmar Ratio</span>
+            <span class="mono">&mdash;</span>
+          </div>
+          <div class="perf-metric-row">
+            <span>Return Multiple</span>
+            <span class="mono">{{ bm250.get('multiple', '3.6') }}x</span>
+          </div>
+          <div class="perf-metric-row">
+            <span>Monthly Win Rate</span>
+            <span class="mono">&mdash;</span>
+          </div>
+          <div class="perf-metric-row">
+            <span>Beta</span>
+            <span class="mono">&mdash;</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- NIFTY 50 Column -->
+      <div class="perf-col">
+        <div class="perf-col-header">
+          <span class="perf-col-badge perf-col-badge-muted">Benchmark</span>
+          <h3>NIFTY 50</h3>
+          <span class="perf-col-desc">Buy &amp; Hold</span>
+        </div>
+        <div class="perf-col-body">
+          <div class="perf-metric-row">
+            <span>CAGR</span>
+            <span class="mono">{{ bm.get('cagr', '9.3') }}%</span>
+          </div>
+          <div class="perf-metric-row">
+            <span>Sharpe Ratio</span>
+            <span class="mono">{{ bm.get('sharpe', '0.64') }}</span>
+          </div>
+          <div class="perf-metric-row">
+            <span>Max Drawdown</span>
+            <span class="mono text-red">{{ bm.get('max_dd', '-38.4') }}%</span>
+          </div>
+          <div class="perf-metric-row">
+            <span>Calmar Ratio</span>
+            <span class="mono">&mdash;</span>
+          </div>
+          <div class="perf-metric-row">
+            <span>Return Multiple</span>
+            <span class="mono">{{ bm.get('multiple', '2.7') }}x</span>
+          </div>
+          <div class="perf-metric-row">
+            <span>Monthly Win Rate</span>
+            <span class="mono">&mdash;</span>
+          </div>
+          <div class="perf-metric-row">
+            <span>Beta</span>
+            <span class="mono">&mdash;</span>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Equity Curve -->
     <div class="chart-container" style="margin-bottom: 56px;">
       <div class="chart-title">Cumulative Growth (Log Scale)</div>
-      <div class="chart-subtitle">Normalised to 100 at inception. EFP Wealth vs NIFTY 50.</div>
+      <div class="chart-subtitle">Normalised to 100 at inception. EFP Wealth vs NIFTY 50 and NIFTY LargeMidcap 250 buy-and-hold.</div>
       <div class="chart-canvas-wrap">
         <canvas id="perfEquityChart"></canvas>
       </div>
@@ -62,26 +176,36 @@
 
     <!-- Annual Returns Table -->
     <h3 style="margin-bottom: 20px;">Annual Returns</h3>
+    <div style="overflow-x: auto;">
     <table class="perf-table" style="margin-bottom: 56px;">
       <thead>
         <tr>
           <th>Year</th>
           <th>EFP Wealth</th>
+          <th>NIFTY LargeMidcap 250</th>
           <th>NIFTY 50</th>
-          <th>Outperformance</th>
+          <th>vs N250</th>
+          <th>vs NIFTY 50</th>
         </tr>
       </thead>
       <tbody>
         {% for year in ar.get('years', []) %}
         {% set wf_ret = ar.get('wf', {}).get(year|string, '') %}
         {% set ni_ret = ar.get('nifty', {}).get(year|string, '') %}
+        {% set n250_ret = ar.get('n250', {}).get(year|string, '') %}
         <tr>
           <td>{{ year }}</td>
           <td class="{% if wf_ret is number and wf_ret >= 0 %}positive{% elif wf_ret is number %}negative{% endif %}">
             {% if wf_ret is number %}{{ '%+.1f'|format(wf_ret) }}%{% else %}&mdash;{% endif %}
           </td>
+          <td class="{% if n250_ret is number and n250_ret >= 0 %}positive{% elif n250_ret is number %}negative{% endif %}">
+            {% if n250_ret is number %}{{ '%+.1f'|format(n250_ret) }}%{% else %}&mdash;{% endif %}
+          </td>
           <td class="{% if ni_ret is number and ni_ret >= 0 %}positive{% elif ni_ret is number %}negative{% endif %}">
             {% if ni_ret is number %}{{ '%+.1f'|format(ni_ret) }}%{% else %}&mdash;{% endif %}
+          </td>
+          <td class="{% if wf_ret is number and n250_ret is number and (wf_ret - n250_ret) >= 0 %}positive{% elif wf_ret is number and n250_ret is number %}negative{% endif %}">
+            {% if wf_ret is number and n250_ret is number %}{{ '%+.1f'|format(wf_ret - n250_ret) }}%{% else %}&mdash;{% endif %}
           </td>
           <td class="{% if wf_ret is number and ni_ret is number and (wf_ret - ni_ret) >= 0 %}positive{% elif wf_ret is number and ni_ret is number %}negative{% endif %}">
             {% if wf_ret is number and ni_ret is number %}{{ '%+.1f'|format(wf_ret - ni_ret) }}%{% else %}&mdash;{% endif %}
@@ -90,11 +214,12 @@
         {% endfor %}
       </tbody>
     </table>
+    </div>
 
     <!-- Drawdown Chart -->
     <div class="chart-container" style="margin-bottom: 56px;">
       <div class="chart-title">Drawdown Analysis</div>
-      <div class="chart-subtitle">Peak-to-trough drawdown over time. Maximum drawdown: {{ h.get('max_dd', '-16.1') }}%.</div>
+      <div class="chart-subtitle">Peak-to-trough drawdown over time. Maximum drawdown: {{ h.get('max_dd', '-24.9') }}%.</div>
       <div class="chart-canvas-wrap" style="height: 240px;">
         <canvas id="drawdownChart"></canvas>
       </div>
@@ -106,14 +231,15 @@
     </div>
 
     <!-- Methodology Integrity -->
-    <div style="background: var(--gray-50); border: var(--border); border-radius: var(--radius); padding: 28px; margin-bottom: 32px;">
-      <h4 style="margin-bottom: 12px;">Methodology Integrity</h4>
-      <p style="font-size: 14px; color: var(--gray-500); line-height: 1.8;">
-        All results are out-of-sample, walk-forward validated across {{ h.get('windows', '17') }} non-overlapping windows.
-        No in-sample optimization of parameters. Survivorship-bias-free constituent data from 96 NSE official
-        monthly snapshots covering 338 unique stocks. 10 bps round-trip slippage applied to all trades.
-        Strategy execution assumes next-day open prices with one-period signal lag. {{ '{:,}'.format(h.get('trades', 60121)) }} total trades
-        across {{ h.get('years', '9.0') }} years.
+    <div class="perf-methodology">
+      <h4>Methodology Integrity</h4>
+      <p>
+        All results are out-of-sample, walk-forward validated across {{ h.get('windows', '21') }} non-overlapping windows.
+        No in-sample optimization of parameters. Fixed 60/40 equity/gold allocation. Staggered daily rebalancing (21 tranches)
+        with 10% max single-stock weight cap. Survivorship-bias-free constituent data from 96 NSE official
+        monthly snapshots covering 464 unique stocks. 10 bps round-trip slippage applied to all trades.
+        Strategy execution assumes next-day open prices with one-period signal lag. {{ '{:,}'.format(h.get('trades', 154355)) }} total trades
+        across {{ h.get('years', '11.0') }} years.
       </p>
     </div>
 
@@ -142,7 +268,19 @@
             backgroundColor: 'rgba(197, 154, 44, 0.05)',
             borderWidth: 2,
             pointRadius: 0,
+            pointHitRadius: 6,
             fill: true,
+            tension: 0.1
+          },
+          {
+            label: 'NIFTY LargeMidcap 250',
+            data: (raw.n250 || {dates:[], values:[]}).dates.map(function(d, i) { return { x: d, y: raw.n250.values[i] }; }),
+            borderColor: '#3B82F6',
+            borderWidth: 1.5,
+            borderDash: [4, 3],
+            pointRadius: 0,
+            pointHitRadius: 6,
+            fill: false,
             tension: 0.1
           },
           {
@@ -152,6 +290,7 @@
             borderWidth: 1.5,
             borderDash: [6, 4],
             pointRadius: 0,
+            pointHitRadius: 6,
             fill: false,
             tension: 0.1
           }

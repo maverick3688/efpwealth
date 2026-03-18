@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / 'data'
 CURRENT_TERMS_VERSION = "1.0"
 
-# SEBI status — change when registered
+# SEBI status — partner firm has applied; update when registered
 SEBI_STATUS = "Applied For"
 SEBI_REG_NUMBER = None
 

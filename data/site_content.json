@@ -1,7 +1,7 @@
 {
   "landing": {
     "hero_headline": "Systematic Alpha for <span class=\"text-gold\">Serious Capital</span>",
-    "hero_subtitle": "An 8-factor, regime-aware strategy with walk-forward validation across {years} years. Designed for patient, long-term capital seeking systematic alpha with institutional-grade risk management.",
+    "hero_subtitle": "An 8-factor quantitative strategy with fixed 65/35 equity/gold allocation, walk-forward validated across {years} years. Designed for patient, long-term capital seeking systematic alpha with institutional-grade risk management.",
     "metric_labels": {
       "cagr": "CAGR",
       "sharpe": "Sharpe Ratio",
@@ -9,17 +9,21 @@
       "alpha": "Alpha vs NIFTY"
     },
     "equity_chart_title": "Growth of \u20b91 Crore",
-    "equity_chart_subtitle": "Walk-forward out-of-sample results vs NIFTY 50 buy-and-hold. Normalised to 100 at inception.",
+    "equity_chart_subtitle": "Walk-forward out-of-sample results vs NIFTY 50 and NIFTY LargeMidcap 250 buy-and-hold. Normalised to 100 at inception.",
     "deep_dive_title": "Want the Full Picture?",
-    "deep_dive_subtitle": "Detailed analytics dashboard with per-window breakdowns, drawdown analysis, and regime performance.",
+    "deep_dive_subtitle": "Detailed analytics dashboard with per-window breakdowns, drawdown analysis, and factor performance.",
     "process_steps": [
       {
-        "title": "Factor-Based Stock Selection",
-        "description": "8 quantitative factors spanning momentum, value, quality, and low volatility. Cross-sectional ranking of NIFTY LargeMidcap 250 constituents. Top 20 positions with 15% max single-stock weight, rebalanced daily across 21 staggered tranches."
+        "title": "Quality Pre-Screening",
+        "description": "Hard filters remove fundamentally weak stocks before factor scoring. Excludes companies with negative earnings, low return on capital (<8%), excessive leverage (D/E >1.5), thin margins (<3%), deteriorating profitability, or low return on equity (<5%)."
       },
       {
-        "title": "Regime-Aware Allocation",
-        "description": "Multi-signal ensemble detects market regimes on a continuous scale. Dynamically allocates between equities and gold based on conviction."
+        "title": "Factor-Based Stock Selection",
+        "description": "8 quantitative factors spanning momentum, trend, value, and quality. Cross-sectional ranking of NIFTY LargeMidcap 250 constituents. Top 25 positions with 8% max single-stock weight, rebalanced daily across 50 staggered tranches."
+      },
+      {
+        "title": "Strategic Asset Allocation",
+        "description": "Fixed 65% equity / 35% gold allocation provides consistent diversification. Gold acts as a structural hedge, reducing drawdowns without the noise penalty of dynamic market timing."
       },
       {
         "title": "Walk-Forward Validation",
@@ -44,13 +48,19 @@
           "label": "Market Timing",
           "typical_pms": "Ad hoc cash calls",
           "index_funds": "Fully invested always",
-          "efp": "Systematic regime detection"
+          "efp": "Fixed 65/35 equity/gold allocation"
         },
         {
           "label": "Survivorship Bias",
           "typical_pms": "Rarely addressed",
           "index_funds": "Not applicable",
           "efp": "96 point-in-time NSE snapshots"
+        },
+        {
+          "label": "Universe",
+          "typical_pms": "Often includes small/micro caps",
+          "index_funds": "Broad market or large-cap only",
+          "efp": "NIFTY LargeMidcap 250 only \u2014 zero small-cap risk"
         },
         {
           "label": "Transparency",
@@ -61,19 +71,19 @@
       ]
     },
     "cta_headline": "For Qualified Investors Seeking Systematic,<br>Research-Driven Portfolio Management",
-    "cta_body": "Minimum investment \u20b950 Lakhs. Available to accredited investors who understand and accept the risks of systematic equity strategies.",
-    "cta_contact_email": "inquiries@efpwealth.com"
+    "cta_body": "Minimum investment \u20b91 Crore. Available to qualified investors who understand and accept the risks of systematic equity strategies.",
+    "cta_contact_email": "inquiry@efpwealth.in"
   },
   "approach": {
     "page_title": "Our Approach",
-    "page_subtitle": "A systematic, rules-based investment process combining factor-based stock selection, regime-aware allocation, and rigorous out-of-sample validation.",
+    "page_subtitle": "A systematic, rules-based investment process combining factor-based stock selection, strategic asset allocation, and rigorous out-of-sample validation.",
     "philosophy_paragraphs": [
-      "We believe that markets reward certain persistent risk premia \u2014 momentum, value, quality, and low volatility \u2014 that can be harvested systematically. Rather than relying on human judgement or conviction-based stock picking, we use a quantitative model that ranks stocks on 8 measurable factors and constructs portfolios purely based on data.",
-      "Equally important is knowing <strong>when</strong> to invest. Our regime detection ensemble continuously monitors market conditions and adjusts the portfolio's allocation between equities and gold. This reduces drawdowns without sacrificing long-term returns.",
+      "We believe that markets reward certain persistent risk premia \u2014 momentum, value, quality, and trend \u2014 that can be harvested systematically. Rather than relying on human judgement or conviction-based stock picking, we use a quantitative model that ranks stocks on 8 measurable factors and constructs portfolios purely based on data.",
+      "Equally important is <strong>how capital is allocated</strong>. We maintain a fixed 65% equity / 35% gold allocation, providing consistent diversification across market cycles. Our research showed that dynamic market timing signals have near-zero predictive power for forward returns, so we avoid the noise penalty of regime-switching and capture gold's structural diversification benefit instead.",
       "Every aspect of our methodology is walk-forward validated \u2014 we never use future data to make past decisions. This discipline ensures that our track record reflects what an investor would have actually experienced, not an optimised backtest."
     ],
     "factor_section_title": "Multi-Factor Stock Selection",
-    "factor_section_subtitle": "Stocks from the NIFTY LargeMidcap 250 universe are ranked across four factor categories. Top 20 stocks by composite score are selected with a 15% max single-stock weight cap, rebalanced daily across 21 staggered tranches.",
+    "factor_section_subtitle": "Stocks are selected exclusively from the NIFTY LargeMidcap 250 universe \u2014 no small-cap exposure, only India\u2019s top 250 companies by market capitalisation. Ranked across four factor categories, with the top 25 stocks by composite score selected with an 8% max single-stock weight cap, rebalanced daily across 50 staggered tranches.",
     "factor_categories": [
       {
         "name": "Momentum",
@@ -91,24 +101,34 @@
         "icon": "value"
       },
       {
-        "name": "Low Volatility",
-        "description": "Risk-reduction tilt toward stable names",
-        "icon": "shield"
+        "name": "Trend",
+        "description": "Price trend strength, proximity to highs, and volatility contraction",
+        "icon": "trend"
       }
     ],
-    "regime_title": "Regime-Aware Allocation",
-    "regime_subtitle": "A multi-signal ensemble detects market regimes on a continuous scale. The allocation between equities and gold shifts dynamically based on regime conviction.",
+    "quality_filter_title": "Quality Pre-Screening",
+    "quality_filter_subtitle": "Before factor scoring, hard filters remove fundamentally weak stocks from the investable universe. This quality gate reduces exposure to value traps and financially stressed companies.",
+    "quality_criteria": [
+      {"name": "Positive Earnings", "description": "Excludes companies with negative earnings yield — no loss-making stocks enter the portfolio"},
+      {"name": "Return on Capital >8%", "description": "Minimum ROCE threshold ensures capital is deployed efficiently"},
+      {"name": "Leverage Check", "description": "Debt-to-equity below 1.5x for non-financial companies (banks and NBFCs exempted as leverage is their business model)"},
+      {"name": "Operating Margins >3%", "description": "Filters out companies with unsustainably thin margins"},
+      {"name": "Margin Stability", "description": "Excludes stocks where operating margins have deteriorated by more than 40% year-on-year"},
+      {"name": "Return on Equity >5%", "description": "Minimum ROE threshold removes companies generating poor shareholder returns"}
+    ],
+    "regime_title": "Strategic Asset Allocation",
+    "regime_subtitle": "A fixed 65% equity / 35% gold allocation provides consistent diversification. Gold reduces portfolio volatility and drawdowns while equities drive long-term growth.",
     "allocation_chart_title": "Historical Asset Allocation",
-    "allocation_chart_subtitle": "Dynamic allocation across equities and gold based on regime confidence score. Each bar represents a rebalance cycle (21 daily staggered tranches per cycle).",
+    "allocation_chart_subtitle": "Fixed 65/35 equity/gold allocation across all rebalance cycles. Each bar represents a rebalance point (50 daily staggered tranches per cycle).",
     "wf_section_title": "Walk-Forward Validation",
     "wf_section_subtitle": "The strongest test of any investment strategy is whether it works on data it has never seen. We use walk-forward validation \u2014 the gold standard in systematic trading research.",
-    "wf_description": "<strong>How it works:</strong> In each window, the model optimises factor weights on the training data (2 years), then applies those weights to the subsequent test period (6 months) that it has never seen. Within each test window, the portfolio is rebalanced daily via 21 staggered tranches with a 15% maximum single-stock weight cap, reducing timing risk and market impact. The portfolio track record is built entirely from these test periods \u2014 none of the reported returns come from in-sample data.",
+    "wf_description": "<strong>How it works:</strong> In each window, the model optimises factor weights on the training data (2 years), then applies those weights to the subsequent test period (6 months) that it has never seen. Within each test window, the portfolio is rebalanced daily via 50 staggered tranches with an 8% maximum single-stock weight cap, reducing timing risk and market impact. Each tranche rebalances every 50 trading days, substantially reducing portfolio turnover. The portfolio track record is built entirely from these test periods \u2014 none of the reported returns come from in-sample data.",
     "wf_survivorship": "<strong>Survivorship bias elimination:</strong> At each point in time, the stock universe is reconstructed from official NSE constituent PDFs. We maintain 96 point-in-time snapshots covering 338 unique stocks, ensuring that only stocks that were actually in the index at that time are considered."
   },
   "performance": {
     "page_title": "Track Record",
     "page_subtitle": "Walk-forward out-of-sample results from {period_start} to {period_end}. All returns include 10 bps round-trip slippage.",
-    "methodology_note": "All results are out-of-sample, walk-forward validated across {windows} non-overlapping windows. No in-sample optimization of parameters. Staggered daily rebalancing (21 tranches) with 15% max single-stock weight cap. Survivorship-bias-free constituent data from 96 NSE official monthly snapshots covering 338 unique stocks. 10 bps round-trip slippage applied to all trades. Strategy execution assumes next-day open prices with one-period signal lag. {trades:,} total trades across {years} years."
+    "methodology_note": "All results are out-of-sample, walk-forward validated across {windows} non-overlapping windows. No in-sample optimization of parameters. Fixed 65/35 equity/gold allocation. Staggered daily rebalancing (50 tranches, each rebalancing every 50 trading days) with 8% max single-stock weight cap. Survivorship-bias-free constituent data from 96 NSE official monthly snapshots covering 464 unique stocks. 10 bps round-trip slippage applied to all trades. {trades:,} total trades across {years} years."
   },
   "about": {
     "page_title": "About EFP Wealth",
@@ -129,22 +149,22 @@
       },
       {
         "title": "Risk Before Return",
-        "description": "Regime-aware allocation prioritises capital preservation. We would rather underperform in euphoria than suffer catastrophic loss in a crisis."
+        "description": "A fixed 65/35 equity/gold allocation prioritises capital preservation. Gold provides structural downside protection across market cycles."
       },
       {
         "title": "Radical Transparency",
         "description": "Our methodology, factors, signals, and validation process are fully disclosed. Investors know exactly how their capital is managed."
       }
     ],
-    "contact_email": "inquiries@efpwealth.com",
-    "contact_web": "efpwealth.pythonanywhere.com",
-    "min_investment": "\u20b950 Lakhs"
+    "contact_email": "inquiry@efpwealth.in",
+    "contact_web": "www.efpwealth.in",
+    "min_investment": "\u20b91 Crore"
   },
   "disclaimers": {
     "banner_text": "All returns shown are BACKTESTED, HYPOTHETICAL results using historical data. They do NOT represent actual trading. Past performance does not guarantee future results. Investments are subject to market risks. This is not investment advice.",
     "sticky_text": "Backtested, hypothetical results. Past performance does not guarantee future results. Not investment advice.",
     "footer_text": "IMPORTANT DISCLOSURES: All returns shown are based on walk-forward backtested results using historical data and are HYPOTHETICAL. They do not represent actual trading and were derived with the benefit of hindsight. Past performance does not guarantee future results and is not indicative of future returns. Backtested performance has inherent limitations: (1) it is designed with the benefit of hindsight, (2) it does not reflect the impact of economic and market factors differently than during the backtested period, (3) it cannot fully account for the impact of financial risk in actual trading, (4) actual results may differ due to market conditions, liquidity, and execution differences. Walk-forward validation mitigates overfitting but does not eliminate it. 10 bps round-trip slippage applied. Does not include management fees, taxes, stamp duty, STT, or impact costs beyond slippage. Strategy results assume full investment at model signals; actual investor returns may differ. Investments in securities are subject to market risks. Read all related documents carefully before investing.",
-    "methodology_disclosure": "Walk-forward backtested performance using 17 non-overlapping 6-month out-of-sample windows from 2016-2026. Factor weights optimised on 2-year training windows. Survivorship-bias-corrected using 96 point-in-time NSE constituent snapshots covering 464 unique stocks. Constituent data may have gaps of up to 6 months in recent periods.",
+    "methodology_disclosure": "Walk-forward backtested performance using 21 non-overlapping 6-month out-of-sample windows from 2015-2026. Factor weights optimised on 2-year training windows. Fixed 65/35 equity/gold allocation. 50 staggered tranches, each rebalancing every 50 trading days, with 8% max single-stock weight. Survivorship-bias-corrected using 96 point-in-time NSE constituent snapshots covering 464 unique stocks. Constituent data may have gaps of up to 6 months in recent periods.",
     "bias_disclosures": "Potential biases: (1) Survivorship bias \u2014 mitigated via point-in-time constituent data (96 snapshots); 46 of 464 historical constituents have incomplete data (6.1% of constituent-months). (2) Look-ahead bias \u2014 mitigated via walk-forward validation (no future data in training). (3) Data-snooping bias \u2014 8 weight presets tested per window; risk of overfitting partially addressed by out-of-sample validation. (4) Transaction cost bias \u2014 10 bps round-trip slippage applied; actual costs may differ. (5) Selection bias \u2014 NIFTY LargeMidcap 250 universe selected ex-ante, not cherry-picked."
   },
   "navigation": {
@@ -152,8 +172,8 @@
     "brand_sub": "Wealth"
   },
   "meta": {
-    "content_version": "2.1",
-    "last_edited": "2026-03-05",
+    "content_version": "4.0",
+    "last_edited": "2026-03-18",
     "notes": "Edit this file to update website text. Restart Flask (or reload on PythonAnywhere) to apply changes."
   }
 }

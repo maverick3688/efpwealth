@@ -13,8 +13,9 @@
 {% set c = content.get('landing', {}) %}
 
 <!-- Hero (dark gradient, centered — V1 style) -->
-<section class="hero-dark">
-  <div class="container">
+<section class="hero-dark" style="position: relative; overflow: hidden;">
+  <canvas id="particleGrid" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;"></canvas>
+  <div class="container" style="position: relative; z-index: 1;">
     <h1>{{ c.get('hero_headline', 'Systematic Alpha for <span class="text-gold">Serious Capital</span>') | safe }}</h1>
     <p class="hero-subtitle">
       {{ c.get('hero_subtitle', '') | fill_metrics(h) }}
@@ -95,7 +96,7 @@
   <div class="container">
     <h2 class="section-title">{{ c.get('deep_dive_title', 'Want the Full Picture?') }}</h2>
     <p class="section-subtitle">
-      {{ c.get('deep_dive_subtitle', 'Detailed analytics dashboard with per-window breakdowns, drawdown analysis, and regime performance.') }}
+      {{ c.get('deep_dive_subtitle', 'Detailed analytics dashboard with per-window breakdowns, drawdown analysis, and factor performance.') }}
     </p>
     <a href="/analytics" class="btn-primary">Deep Dive into Analytics &rarr;</a>
   </div>
@@ -162,10 +163,10 @@
 <section class="cta-section">
   <div class="container">
     <h2>{{ c.get('cta_headline', 'For Qualified Investors Seeking Systematic,<br>Research-Driven Portfolio Management') | safe }}</h2>
-    <p>{{ c.get('cta_body', 'Minimum investment &#x20B9;50 Lakhs.') }}</p>
+    <p>{{ c.get('cta_body', 'Minimum investment &#x20B9;1 Crore.') }}</p>
     <a href="/about#contact" class="btn-primary">Schedule a Consultation</a>
     <div class="cta-contact">
-      Or write to us at <a href="mailto:{{ c.get('cta_contact_email', 'inquiries@efpwealth.com') }}">{{ c.get('cta_contact_email', 'inquiries@efpwealth.com') }}</a>
+      Or write to us at <a href="mailto:{{ c.get('cta_contact_email', 'inquiry@efpwealth.in') }}">{{ c.get('cta_contact_email', 'inquiry@efpwealth.in') }}</a>
     </div>
   </div>
 </section>
@@ -199,6 +200,17 @@
           pointRadius: 0,
           pointHitRadius: 6,
           fill: true,
+          tension: 0.1
+        },
+        {
+          label: 'NIFTY LargeMidcap 250',
+          data: (raw.n250 || {dates:[], values:[]}).dates.map(function(d, i) { return { x: d, y: raw.n250.values[i] }; }),
+          borderColor: '#3B82F6',
+          borderWidth: 1.5,
+          borderDash: [4, 3],
+          pointRadius: 0,
+          pointHitRadius: 6,
+          fill: false,
           tension: 0.1
         },
         {
@@ -261,6 +273,90 @@
       }
     }
   });
+})();
+</script>
+
+<!-- Particle Grid Background -->
+<script>
+(function() {
+  var canvas = document.getElementById('particleGrid');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var dpr = window.devicePixelRatio || 1;
+  var particles = [];
+  var CONNECT_DIST = 160;
+  var SPEED = 0.25;
+  var DOT_COLOR = 'rgba(197, 154, 44, 0.45)';
+  var LINE_COLOR_BASE = [197, 154, 44];
+  var DOT_RADIUS = 1.8;
+  var w, h, count;
+
+  function resize() {
+    var rect = canvas.parentElement.getBoundingClientRect();
+    w = rect.width;
+    h = rect.height;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    // Scale particle count to area (roughly 1 per 9000px²)
+    var target = Math.min(Math.max(Math.floor(w * h / 9000), 35), 100);
+    while (particles.length < target) particles.push(makeParticle());
+    if (particles.length > target) particles.length = target;
+    count = particles.length;
+  }
+
+  function makeParticle() {
+    return {
+      x: Math.random() * (w || 800),
+      y: Math.random() * (h || 500),
+      vx: (Math.random() - 0.5) * SPEED,
+      vy: (Math.random() - 0.5) * SPEED,
+      r: DOT_RADIUS + Math.random() * 1.0
+    };
+  }
+
+  function tick() {
+    ctx.clearRect(0, 0, w, h);
+    // Update positions
+    for (var i = 0; i < count; i++) {
+      var p = particles[i];
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < -10) p.x = w + 10;
+      else if (p.x > w + 10) p.x = -10;
+      if (p.y < -10) p.y = h + 10;
+      else if (p.y > h + 10) p.y = -10;
+    }
+    // Draw connections
+    for (var i = 0; i < count; i++) {
+      for (var j = i + 1; j < count; j++) {
+        var dx = particles[i].x - particles[j].x;
+        var dy = particles[i].y - particles[j].y;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < CONNECT_DIST) {
+          var alpha = (1 - dist / CONNECT_DIST) * 0.15;
+          ctx.strokeStyle = 'rgba(' + LINE_COLOR_BASE[0] + ',' + LINE_COLOR_BASE[1] + ',' + LINE_COLOR_BASE[2] + ',' + alpha + ')';
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    // Draw dots
+    ctx.fillStyle = DOT_COLOR;
+    for (var i = 0; i < count; i++) {
+      ctx.beginPath();
+      ctx.arc(particles[i].x, particles[i].y, particles[i].r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    requestAnimationFrame(tick);
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+  requestAnimationFrame(tick);
 })();
 </script>
 

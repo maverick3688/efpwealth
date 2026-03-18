@@ -59,9 +59,9 @@
       <div>
         <h4>Regulatory Status</h4>
         {% if sebi_reg %}
-        <p>SEBI Registered: {{ sebi_reg }}<br>Investment Advisory under SEBI (IA) Regulations, 2013.</p>
+        <p>SEBI Registered: {{ sebi_reg }} (via partner firm).<br>Investment Advisory under SEBI (IA) Regulations, 2013.</p>
         {% else %}
-        <p>SEBI Registration {{ sebi_status }}.<br>Investment Advisory under SEBI (IA) Regulations, 2013.</p>
+        <p>SEBI Registration {{ sebi_status }} (via partner firm).<br>Investment Advisory under SEBI (IA) Regulations, 2013.</p>
         {% endif %}
       </div>
       <div>
