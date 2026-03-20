@@ -6,3 +6,5 @@ pa_config.json
 *.egg-info/
 dist/
 build/
+nul
+.wrangler/

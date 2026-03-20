@@ -38,7 +38,11 @@ def generate():
     curves = pd.read_csv(eq_path, index_col=0, parse_dates=True)
 
     wf = curves['WalkForward'].dropna()
-    nifty = curves['NIFTY_100pct'].loc[wf.index[0]:wf.index[-1]].dropna()
+
+    # Use NIFTY 50 ETF data directly (not N250_100pct which starts late)
+    nifty50_path = DATA_DIR / 'etfs' / 'NIFTY50.parquet'
+    nifty50_raw = pd.read_parquet(nifty50_path)['Close']
+    nifty = nifty50_raw.loc[wf.index[0]:wf.index[-1]].dropna()
 
     # --- Core metrics ---
     wf_start, wf_end = wf.index[0], wf.index[-1]
@@ -77,7 +81,7 @@ def generate():
         'period_end': wf_end.strftime('%b %Y'),
         'years': round(years, 1),
         'trades': len(pd.read_csv(DATA_DIR / 'wf_trades.csv')) if (DATA_DIR / 'wf_trades.csv').exists() else 0,
-        'windows': 17,
+        'windows': 21,
     }
 
     # --- Equity curve (weekly, normalized to 100) ---

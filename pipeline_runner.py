@@ -546,15 +546,25 @@ def _run_step(step_key, mode='daily'):
                 except Exception as e:
                     pass  # non-fatal per file, continue
 
-            # 2. Reload webapp
-            try:
-                reload_url = f'https://www.pythonanywhere.com/api/v0/user/{pa_user}/webapps/{pa_domain}/reload/'
-                req = urllib.request.Request(reload_url, data=b'', headers=headers, method='POST')
-                urllib.request.urlopen(req, timeout=30)
-            except urllib.error.HTTPError as e:
-                return False, f'Reload failed: HTTP {e.code} - {e.read().decode("utf-8", errors="replace")}'
-            except Exception as e:
-                return False, f'Reload failed: {str(e)}'
+            # 2. Reload webapp(s) — staging + production
+            reload_domains = [pa_domain]
+            prod_domain = config.get('production_domain', '')
+            if prod_domain and prod_domain != pa_domain:
+                reload_domains.append(prod_domain)
+
+            reload_errors = []
+            for rd in reload_domains:
+                try:
+                    reload_url = f'https://www.pythonanywhere.com/api/v0/user/{pa_user}/webapps/{rd}/reload/'
+                    req = urllib.request.Request(reload_url, data=b'', headers=headers, method='POST')
+                    urllib.request.urlopen(req, timeout=30)
+                except urllib.error.HTTPError as e:
+                    reload_errors.append(f'{rd}: HTTP {e.code}')
+                except Exception as e:
+                    reload_errors.append(f'{rd}: {str(e)}')
+
+            if reload_errors and len(reload_errors) == len(reload_domains):
+                return False, f'Reload failed: {"; ".join(reload_errors)}'
 
             # 3. Verify signals file was uploaded correctly
             try:
@@ -573,6 +583,52 @@ def _run_step(step_key, mode='daily'):
                 verify_note = ''
 
             return True, f'Uploaded {uploaded} files, reloaded{verify_note}'
+
+        elif step_key == 'deploy_cloudflare':
+            # Build static site and deploy to Cloudflare Pages (production)
+            try:
+                import importlib.util
+                spec = importlib.util.spec_from_file_location(
+                    'build_static', WEB_DIR / 'build_static.py')
+                build_mod = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(build_mod)
+
+                # Build static site
+                build_ok = build_mod.build()
+                if not build_ok:
+                    return False, 'Static site build failed'
+
+                # Load Cloudflare token from config
+                cf_config = json.loads(
+                    (WEB_DIR / 'pa_config.json').read_text(encoding='utf-8'))
+                cf_token = cf_config.get('cloudflare_api_token', '')
+                cf_project = cf_config.get('cloudflare_project', 'efpwealth')
+                if not cf_token:
+                    return True, 'Skipped (no cloudflare_api_token in config)'
+
+                os.environ['CLOUDFLARE_API_TOKEN'] = cf_token
+
+                # Deploy via wrangler
+                import subprocess as sp
+                result = sp.run(
+                    ['npx', 'wrangler', 'pages', 'deploy',
+                     str(WEB_DIR / 'dist'),
+                     f'--project-name={cf_project}',
+                     '--branch=main',
+                     '--commit-dirty=true'],
+                    capture_output=True, timeout=300,
+                    shell=True, cwd=str(WEB_DIR),
+                )
+                if result.returncode != 0:
+                    stderr = result.stderr.decode('utf-8', errors='replace')[:500]
+                    return False, f'Wrangler deploy failed: {stderr}'
+
+                return True, 'Cloudflare Pages deployed'
+            except FileNotFoundError:
+                return True, 'Skipped (wrangler not installed)'
+            except Exception as e:
+                # Non-fatal: PA staging still works
+                return True, f'Skipped ({str(e)[:200]})'
 
     except Exception as e:
         return False, f'{str(e)}\n{traceback.format_exc()}'
@@ -594,6 +650,7 @@ PIPELINE_STEPS = [
     ('copy', 'Copying files to web'),
     ('deploy', 'Git commit & push'),
     ('reload_remote', 'Reloading remote webapp'),
+    ('deploy_cloudflare', 'Deploying to Cloudflare Pages'),
 ]
 
 # Mid-day mode: lighter pipeline — only fetch prices, regenerate signals, deploy

@@ -452,7 +452,7 @@ canvas {{ max-height: 380px; }}
             <div class="footer-links">
                 <a href="/login">Client Login</a>
                 <a href="/disclosure">Disclosure</a>
-                <a href="mailto:contact@efpwealth.com">Contact</a>
+                <a href="mailto:inquiry@efpwealth.in">Contact</a>
             </div>
         </div>
         <div class="footer-disc">
